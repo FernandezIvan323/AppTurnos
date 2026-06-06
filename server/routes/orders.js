@@ -94,13 +94,27 @@ router.post("/", authRequired, async (req, res) => {
     // Verificar mesa libre
     if (type === "table") {
       const { rows: occ } = await client.query(
-        `SELECT id FROM orders WHERE table_id = $1 AND status NOT IN ('paid','cancelled') LIMIT 1`,
+        `SELECT id FROM orders WHERE table_id = $1 AND status NOT IN ('paid','cancelled','delivered') LIMIT 1`,
         [table_id]
       );
       if (occ.length > 0) {
         await client.query("ROLLBACK");
         return res.status(409).json({ error: "La mesa ya está ocupada" });
       }
+      if (req.user.role === "waiter") {
+        const { rows: own } = await client.query(
+          "SELECT 1 FROM waiter_tables WHERE user_id = $1 AND table_id = $2 LIMIT 1",
+          [req.user.id, table_id]
+        );
+        if (own.length === 0) {
+          await client.query("ROLLBACK");
+          return res.status(403).json({ error: "Esta mesa no está asignada a ti" });
+        }
+      }
+    }
+
+    if (req.user.role === "waiter" && type !== "table") {
+      return res.status(403).json({ error: "Los meseros solo pueden crear pedidos de mesa" });
     }
 
     const initialStatus = "pending";

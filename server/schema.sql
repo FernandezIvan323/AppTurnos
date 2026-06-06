@@ -98,3 +98,14 @@ CREATE INDEX IF NOT EXISTS idx_orders_type         ON orders(type);
 CREATE INDEX IF NOT EXISTS idx_orders_created      ON orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_orderitems_order    ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_products_category   ON products(category_id);
+
+-- Asignación de mesas a meseros
+CREATE TABLE IF NOT EXISTS waiter_tables (
+  id           SERIAL PRIMARY KEY,
+  user_id      INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  table_id     INT NOT NULL REFERENCES tables(id) ON DELETE CASCADE,
+  assigned_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, table_id)
+);
+CREATE INDEX IF NOT EXISTS idx_waiter_tables_user  ON waiter_tables(user_id);
+CREATE INDEX IF NOT EXISTS idx_waiter_tables_table ON waiter_tables(table_id);

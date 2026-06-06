@@ -5,7 +5,7 @@ import Header from "../../components/Header";
 import { useAuth } from "../../store/auth";
 import { money, formatTime, statusLabels, statusColors } from "../../lib/format";
 import {
-  Plus, X, Minus, CheckCircle2, Receipt, Clock, ChefHat, ArrowLeft,
+  Plus, X, Minus, CheckCircle2, Receipt, Clock, ChefHat, ArrowLeft, Utensils,
 } from "lucide-react";
 
 function timeAgo(iso) {
@@ -206,9 +206,23 @@ export default function TablesPage() {
   return (
     <div>
       <Header
-        title="Mesas"
-        subtitle={user?.role === "waiter" ? "Toca una mesa para abrir o agregar a la cuenta" : "Estado de las mesas en tiempo real"}
+        title={user?.role === "waiter" ? "Mis mesas" : "Mesas"}
+        subtitle={
+          user?.role === "waiter"
+            ? "Toca una mesa para abrir o agregar a la cuenta"
+            : "Estado de las mesas en tiempo real"
+        }
       />
+
+      {user?.role === "waiter" && tables.length === 0 && !loading && (
+        <div className="card p-8 text-center bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
+          <Utensils size={32} className="mx-auto text-amber-500 mb-2"/>
+          <div className="font-semibold text-ink-800 dark:text-ink-100">No tienes mesas asignadas</div>
+          <p className="text-sm text-ink-600 dark:text-ink-400 mt-1">
+            Pídele al cajero que te asigne mesas desde <b>Personal → Asignaciones</b>.
+          </p>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-sm text-ink-500 dark:text-ink-400">Cargando…</div>

@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "../../lib/api";
 import Header from "../../components/Header";
 import { useAuth } from "../../store/auth";
 import { money } from "../../lib/format";
-import { Plus, Edit2, Trash2, X, Tag, ShoppingBag } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Tag, ShoppingBag, Search, CheckCircle2, XCircle } from "lucide-react";
 
 function CategoryModal({ cat, onClose, onSaved }) {
   const [name, setName] = useState(cat?.name || "");
@@ -104,8 +104,109 @@ function ProductModal({ product, categories, onClose, onSaved }) {
   );
 }
 
-export default function Menu() {
-  const { user } = useAuth();
+function ReadOnlyCatalog() {
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const [p, c] = await Promise.all([api.get("/products"), api.get("/categories")]);
+      setProducts(p.data); setCategories(c.data);
+    })();
+  }, []);
+
+  const grouped = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    const matches = (p) => !term || p.name.toLowerCase().includes(term) || (p.description || "").toLowerCase().includes(term);
+    const cats = categories.map((c) => ({ ...c, products: products.filter((p) => p.category_id === c.id && matches(p)) }));
+    const noCat = products.filter((p) => !p.category_id && matches(p));
+    return { cats, noCat, totalShown: cats.reduce((s, c) => s + c.products.length, 0) + noCat.length };
+  }, [categories, products, search]);
+
+  return (
+    <div>
+      <Header
+        title="Catálogo de productos"
+        subtitle="Lo que ofrecemos a los clientes"
+        right={
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-3 text-ink-400"/>
+            <input
+              className="input pl-8 w-64"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar producto…"
+            />
+          </div>
+        }
+      />
+
+      <div className="text-sm text-ink-500 dark:text-ink-400 mb-4">
+        {grouped.totalShown} producto{grouped.totalShown === 1 ? "" : "s"} disponible{grouped.totalShown === 1 ? "" : "s"}
+      </div>
+
+      <div className="space-y-6">
+        {grouped.cats.map((c) => (
+          <div key={c.id}>
+            <h2 className="text-lg font-semibold text-ink-800 dark:text-ink-100 mb-3 flex items-center gap-2">
+              <Tag size={16} className="text-brand-600 dark:text-brand-400"/>
+              {c.name}
+              <span className="text-xs text-ink-400 dark:text-ink-500 font-normal">({c.products.length})</span>
+            </h2>
+            {c.products.length === 0 ? (
+              <div className="text-sm text-ink-400 dark:text-ink-500 italic">Sin productos en esta categoría.</div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {c.products.map((p) => (
+                  <div key={p.id} className="card p-3 flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <div className="font-medium text-ink-800 dark:text-ink-100">{p.name}</div>
+                      {p.description && <div className="text-xs text-ink-500 dark:text-ink-400 mt-0.5">{p.description}</div>}
+                      <div className="text-brand-700 dark:text-brand-300 font-semibold mt-1">{money(p.price)}</div>
+                    </div>
+                    {p.available
+                      ? <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                      : <XCircle size={16} className="text-slate-400 shrink-0 mt-0.5" />}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+        {grouped.noCat.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold text-ink-800 dark:text-ink-100 mb-3 flex items-center gap-2">
+              <Tag size={16} className="text-ink-400"/>
+              Sin categoría
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {grouped.noCat.map((p) => (
+                <div key={p.id} className="card p-3 flex items-start justify-between gap-2">
+                  <div className="flex-1">
+                    <div className="font-medium text-ink-800 dark:text-ink-100">{p.name}</div>
+                    <div className="text-brand-700 dark:text-brand-300 font-semibold mt-1">{money(p.price)}</div>
+                  </div>
+                  {p.available
+                    ? <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                    : <XCircle size={16} className="text-slate-400 shrink-0 mt-0.5" />}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {grouped.totalShown === 0 && (
+          <div className="card p-8 text-center text-ink-500 dark:text-ink-400">
+            <ShoppingBag size={32} className="mx-auto text-ink-300 dark:text-ink-700 mb-2"/>
+            {search ? `Sin resultados para "${search}"` : "El catálogo está vacío."}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AdminMenu() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [editingCat, setEditingCat] = useState(null);
@@ -118,10 +219,6 @@ export default function Menu() {
     setProducts(p.data); setCategories(c.data);
   };
   useEffect(() => { load(); }, []);
-
-  if (user?.role !== "admin") {
-    return <div className="card p-8 text-center text-ink-500 dark:text-ink-400">Esta sección es solo para el administrador.</div>;
-  }
 
   const grouped = categories.map((c) => ({ ...c, products: products.filter((p) => p.category_id === c.id) }));
   const noCat = products.filter((p) => !p.category_id);
@@ -209,4 +306,10 @@ export default function Menu() {
       {editingProd && <ProductModal product={editingProd} categories={categories} onClose={() => setEditingProd(null)} onSaved={load} />}
     </div>
   );
+}
+
+export default function Menu() {
+  const { user } = useAuth();
+  if (user?.role === "waiter") return <ReadOnlyCatalog />;
+  return <AdminMenu />;
 }

@@ -4,25 +4,35 @@ import { authRequired, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
-router.get("/", authRequired, async (_req, res) => {
-  const { rows } = await query(
-    `SELECT t.id, t.number, t.label, t.capacity, t.active,
-            cur.id   AS current_order_id,
-            cur.status AS current_order_status,
-            cur.total  AS current_order_total,
-            cur.created_at AS current_order_created,
-            (SELECT COUNT(*)::int FROM order_items WHERE order_id = cur.id) AS current_order_items
-       FROM tables t
-       LEFT JOIN LATERAL (
-         SELECT id, status, total, created_at
-           FROM orders
-          WHERE table_id = t.id
-            AND status NOT IN ('paid','cancelled','delivered')
-          ORDER BY created_at DESC
-          LIMIT 1
-       ) cur ON true
-      ORDER BY t.number`
-  );
+router.get("/", authRequired, async (req, res) => {
+  const isAdmin = req.user.role === "admin";
+  const userId = req.user.id;
+  const baseSelect = `
+    SELECT t.id, t.number, t.label, t.capacity, t.active,
+           cur.id   AS current_order_id,
+           cur.status AS current_order_status,
+           cur.total  AS current_order_total,
+           cur.created_at AS current_order_created,
+           (SELECT COUNT(*)::int FROM order_items WHERE order_id = cur.id) AS current_order_items,
+           wt.user_id  AS assigned_user_id,
+           wu.name     AS assigned_user_name
+      FROM tables t
+      LEFT JOIN LATERAL (
+        SELECT id, status, total, created_at
+          FROM orders
+         WHERE table_id = t.id
+           AND status NOT IN ('paid','cancelled','delivered')
+         ORDER BY created_at DESC
+         LIMIT 1
+      ) cur ON true
+      LEFT JOIN waiter_tables wt ON wt.table_id = t.id
+      LEFT JOIN users wu          ON wu.id = wt.user_id
+  `;
+  const sql = isAdmin
+    ? baseSelect + " ORDER BY t.number"
+    : baseSelect + " WHERE wt.user_id = $1 ORDER BY t.number";
+  const params = isAdmin ? [] : [userId];
+  const { rows } = await query(sql, params);
   res.json(rows);
 });
 
