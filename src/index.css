@@ -64,3 +64,30 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-ink-400 dark:bg-ink-600;
 }
+
+/* Estilos de impresión para reportes de corte de caja */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  aside,    /* Sidebar */
+  header,   /* Header */
+  nav,      /* NavLinks */
+  .no-print,
+  button {
+    display: none !important;
+  }
+  #closing-printable {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    page-break-inside: avoid;
+  }
+  .card {
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+  }
+  .print\:block { display: block !important; }
+  .print\:hidden { display: none !important; }
+}

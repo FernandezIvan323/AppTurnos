@@ -109,3 +109,31 @@ CREATE TABLE IF NOT EXISTS waiter_tables (
 );
 CREATE INDEX IF NOT EXISTS idx_waiter_tables_user  ON waiter_tables(user_id);
 CREATE INDEX IF NOT EXISTS idx_waiter_tables_table ON waiter_tables(table_id);
+
+-- Corte de caja (cierre Z)
+-- Solo se permite UN cierre por día (closing_date UNIQUE).
+-- Si te equivocás, no se puede modificar: queda como evidencia.
+CREATE TABLE IF NOT EXISTS cash_closings (
+  id              SERIAL PRIMARY KEY,
+  closing_date    DATE NOT NULL UNIQUE,
+  opened_by       INT REFERENCES users(id) ON DELETE SET NULL,
+  closed_by       INT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  closed_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  -- Resumen de ventas del día
+  total_sales     NUMERIC(10,2) NOT NULL DEFAULT 0,
+  total_orders    INT NOT NULL DEFAULT 0,
+  -- Desglose por método de pago
+  cash_sales      NUMERIC(10,2) NOT NULL DEFAULT 0,
+  card_sales      NUMERIC(10,2) NOT NULL DEFAULT 0,
+  transfer_sales  NUMERIC(10,2) NOT NULL DEFAULT 0,
+  mixed_sales     NUMERIC(10,2) NOT NULL DEFAULT 0,
+  -- Efectivo en caja
+  initial_cash    NUMERIC(10,2) NOT NULL DEFAULT 0,
+  expected_cash   NUMERIC(10,2) NOT NULL DEFAULT 0,
+  counted_cash    NUMERIC(10,2) NOT NULL DEFAULT 0,
+  difference      NUMERIC(10,2) NOT NULL DEFAULT 0,
+  -- Otros
+  notes           TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_cash_closings_date  ON cash_closings(closing_date DESC);
+CREATE INDEX IF NOT EXISTS idx_cash_closings_user  ON cash_closings(closed_by);

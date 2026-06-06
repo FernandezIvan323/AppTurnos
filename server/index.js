@@ -12,6 +12,7 @@ import ordersRoutes from "./routes/orders.js";
 import dashboardRoutes from "./routes/dashboard.js";
 import reportsRoutes from "./routes/reports.js";
 import assignmentsRoutes from "./routes/assignments.js";
+import cashClosingsRoutes from "./routes/cashClosings.js";
 
 const app = express();
 app.use(cors());
@@ -29,6 +30,7 @@ app.use("/api/orders", ordersRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/assignments", assignmentsRoutes);
+app.use("/api/cash-closings", cashClosingsRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

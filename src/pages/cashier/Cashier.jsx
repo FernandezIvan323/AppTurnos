@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../../lib/api";
 import Header from "../../components/Header";
 import { money, formatTime, typeLabels, statusLabels, statusColors } from "../../lib/format";
-import { CheckCircle2, Receipt, X, Calculator, CreditCard, Wallet, Banknote, Building2, Truck, Utensils } from "lucide-react";
+import { CheckCircle2, Receipt, X, Calculator, CreditCard, Wallet, Banknote, Building2, Truck, Utensils, ScrollText } from "lucide-react";
 
 function CloseModal({ order, mode = "close", onClose, onClosed }) {
   // mode: 'close' = cobrar y cerrar (efectivo al entregar / mesa)
@@ -187,6 +188,9 @@ export default function Cashier() {
                 </button>
               ))}
             </div>
+            <Link to="/cashier/closing" className="btn-primary text-sm">
+              <ScrollText size={14}/> Corte de caja
+            </Link>
           </div>
         }
       />

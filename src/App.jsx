@@ -5,6 +5,8 @@ import Dashboard from "./pages/Dashboard";
 import Delivery from "./pages/orders/Delivery";
 import TablesPage from "./pages/tables/TablesPage";
 import Cashier from "./pages/cashier/Cashier";
+import CashClosing from "./pages/cashier/CashClosing";
+import ClosingHistory from "./pages/cashier/ClosingHistory";
 import Customers from "./pages/customers/Customers";
 import Menu from "./pages/admin/Menu";
 import Staff from "./pages/admin/Staff";
@@ -19,6 +21,8 @@ export default function App() {
         <Route path="/delivery" element={<Delivery />} />
         <Route path="/tables" element={<TablesPage />} />
         <Route path="/cashier" element={<Cashier />} />
+        <Route path="/cashier/closing" element={<CashClosing />} />
+        <Route path="/cashier/closing/history" element={<ClosingHistory />} />
         <Route path="/customers" element={<Customers />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/staff" element={<Staff />} />
