@@ -20,9 +20,9 @@ function Test-Port([int]$Port) {
 
 function Is-Alive([string]$PidFile) {
   if (-not (Test-Path -LiteralPath $PidFile)) { return $false }
-  $pid = Get-Content -LiteralPath $PidFile -ErrorAction SilentlyContinue
-  if (-not $pid) { return $false }
-  return $null -ne (Get-Process -Id $pid -ErrorAction SilentlyContinue)
+  $procId = Get-Content -LiteralPath $PidFile -ErrorAction SilentlyContinue
+  if (-not $procId) { return $false }
+  return $null -ne (Get-Process -Id $procId -ErrorAction SilentlyContinue)
 }
 
 function Start-One([string]$Name, [string]$Cmd, [string]$PidFile, [string]$Log, [string]$Err) {
@@ -45,22 +45,32 @@ function Start-One([string]$Name, [string]$Cmd, [string]$PidFile, [string]$Log, 
   Write-Host "[detached] $Name arrancado (PID $($proc.Id)). Log: $Log" -ForegroundColor Green
 }
 
-# Verificar puertos
-if (Test-Port 3001) {
-  Write-Host "[detached] ERROR: puerto 3001 ocupado. Mata el proceso y reintenta." -ForegroundColor Red
+# --- 1) Si AMBOS ya estan vivos, salir sin tocar nada (no limpiar logs, no revisar puertos) ---
+$viteAlive = Is-Alive $pidVite
+$apiAlive  = Is-Alive $pidApi
+
+if ($viteAlive -and $apiAlive) {
+  Write-Host "[detached] AppTurnos ya esta corriendo (Vite: $(Get-Content $pidVite), API: $(Get-Content $pidApi))." -ForegroundColor Green
+  Write-Host "[detached] Para detener: npm run dev:stop"
+  exit 0
+}
+
+# --- 2) Verificar puertos solo si el proceso NO esta vivo ---
+if (-not $apiAlive -and (Test-Port 3001)) {
+  Write-Host "[detached] ERROR: puerto 3001 ocupado por otro proceso. Liberalo y reintenta." -ForegroundColor Red
   exit 1
 }
 
-# Limpiar logs viejos
-"" | Set-Content $logVite -Encoding utf8
-"" | Set-Content $errVite -Encoding utf8
-"" | Set-Content $logApi  -Encoding utf8
-"" | Set-Content $errApi  -Encoding utf8
+# --- 3) Limpiar logs solo de los procesos que se van a arrancar ---
+try {
+  if (-not $viteAlive) { "" | Set-Content $logVite -Encoding utf8; "" | Set-Content $errVite -Encoding utf8 }
+  if (-not $apiAlive)  { "" | Set-Content $logApi  -Encoding utf8; "" | Set-Content $errApi  -Encoding utf8 }
+} catch {
+  Write-Host "[detached] AVISO: no se pudieron limpiar logs (¿usados por otro proceso?). Continuando..." -ForegroundColor Yellow
+}
 
-# Arrancar API primero (mas lento)
-Start-One "API"  "npm run dev:api"  $pidApi  $logApi  $errApi
-
-# Arrancar Vite
-Start-One "Vite" "npm run dev:web" $pidVite $logVite $errVite
+# --- 4) Arrancar cada proceso que falte ---
+if (-not $apiAlive)  { Start-One "API"  "npm run dev:api"  $pidApi  $logApi  $errApi }
+if (-not $viteAlive) { Start-One "Vite" "npm run dev:web" $pidVite $logVite $errVite }
 
 Write-Host "[detached] Para detener: npm run dev:stop"
