@@ -31,7 +31,7 @@ router.get("/:id", authRequired, async (req, res) => {
   const orders = await query(
     `SELECT id, type, status, total, created_at FROM orders
       WHERE customer_id = $1
-      ORDER BY created_at DESC LIMIT 20`,
+      ORDER BY created_at DESC LIMIT 10`,
     [req.params.id]
   );
   res.json({ ...rows[0], orders: orders.rows });

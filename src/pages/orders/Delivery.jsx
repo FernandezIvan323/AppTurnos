@@ -7,6 +7,7 @@ import {
   Phone, MapPin, Plus, ChevronRight, X, User as UserIcon,
   CheckCircle2, Truck, XCircle, StickyNote, Search,
   ChefHat, ArrowLeft, RotateCcw, AlertTriangle, Package,
+  Clock,
 } from "lucide-react";
 
 const COLUMNS = [
@@ -376,7 +377,7 @@ function NewOrderModal({ onClose, onCreated }) {
 
 function AssignModal({ order, onClose, onAssigned }) {
   const [persons, setPersons] = useState([]);
-  useEffect(() => { api.get("/delivery").then((r) => setPersons(r.data.filter((p) => p.status === "available"))); }, []);
+  useEffect(() => { api.get("/delivery").then((r) => setPersons(r.data)); }, []);
   const [err, setErr] = useState(null);
   const assign = async (id) => {
     try {
@@ -391,8 +392,8 @@ function AssignModal({ order, onClose, onAssigned }) {
       <div className="card w-full max-w-md p-5">
         <h2 className="text-lg font-semibold text-ink-800 dark:text-ink-100 mb-3">Asignar repartidor · #{order.id}</h2>
         <div className="text-sm text-ink-500 dark:text-ink-400 mb-3">{order.customer_name} · {order.customer_address}</div>
-        {persons.length === 0 && <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">No hay repartidores disponibles.</div>}
-        <div className="space-y-2">
+        {persons.length === 0 && <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">No hay repartidores registrados.</div>}
+        <div className="space-y-2 max-h-80 overflow-y-auto">
           {persons.map((p) => (
             <button
               key={p.id}
@@ -403,7 +404,10 @@ function AssignModal({ order, onClose, onAssigned }) {
                 <div className="font-medium text-ink-800 dark:text-ink-100">{p.name}</div>
                 <div className="text-xs text-ink-500 dark:text-ink-400">{p.phone || "Sin teléfono"}</div>
               </div>
-              <ChevronRight size={18} className="text-ink-400" />
+              <div className="text-right">
+                <div className="text-xs font-semibold text-ink-600 dark:text-ink-300">{p.active_orders} activo{p.active_orders !== 1 ? "s" : ""}</div>
+                <ChevronRight size={18} className="text-ink-400 ml-auto" />
+              </div>
             </button>
           ))}
         </div>
@@ -479,6 +483,84 @@ function OrderDetailModal({ order, onClose, onChanged }) {
   );
 }
 
+function HistoryModal({ onClose }) {
+  const [persons, setPersons] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(null);
+
+  useEffect(() => { api.get("/delivery").then((r) => setPersons(r.data)); }, []);
+
+  const loadHistory = async (id) => {
+    setSelected(id);
+    setLoading(true);
+    setErr(null);
+    try {
+      const { data } = await api.get("/delivery/history", { params: { delivery_person_id: id, limit: 100 } });
+      setHistory(data);
+    } catch (e) {
+      setErr(e.response?.data?.error || e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const pname = persons.find((p) => p.id === selected)?.name || "";
+
+  return (
+    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+      <div className="card w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div className="px-5 py-4 border-b border-paper-300 dark:border-ink-800 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-ink-800 dark:text-ink-100 flex items-center gap-2">
+            <Clock size={18}/> Historial de entregas
+          </h2>
+          <button onClick={onClose} className="btn-ghost"><X size={18}/></button>
+        </div>
+        <div className="p-5 overflow-y-auto flex-1">
+          <div className="flex gap-2 mb-4 flex-wrap">
+            {persons.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => loadHistory(p.id)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition border ${
+                  selected === p.id
+                    ? "bg-brand-500 text-white border-brand-500 dark:bg-brandDark-500 dark:text-[#1E222B]"
+                    : "bg-paper-50 text-ink-600 border-paper-300 hover:bg-paper-200 dark:bg-[#262B36] dark:text-ink-300 dark:border-white/5 dark:hover:bg-[#2E3440]"
+                }`}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
+          {!selected && <div className="text-sm text-ink-400 dark:text-ink-500 text-center py-8">Selecciona un repartidor para ver su historial</div>}
+          {loading && <div className="text-sm text-ink-500 dark:text-ink-400">Cargando…</div>}
+          {err && <div className="text-sm text-rose-700 bg-rose-50 rounded-xl px-3 py-2 dark:bg-rose-900/30 dark:text-rose-300">{err}</div>}
+          {selected && !loading && !err && history.length === 0 && (
+            <div className="text-sm text-ink-400 dark:text-ink-500 text-center py-8">{pname} no tiene entregas registradas.</div>
+          )}
+          {selected && !loading && history.length > 0 && (
+            <div className="space-y-2">
+              {history.map((o) => (
+                <div key={o.id} className="flex items-center justify-between card p-3 text-sm">
+                  <div>
+                    <div className="font-medium text-ink-800 dark:text-ink-100">#{o.id} · {o.customer_name}</div>
+                    <div className="text-xs text-ink-500 dark:text-ink-400">{o.customer_address}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold text-ink-700 dark:text-ink-200">{money(o.total)}</div>
+                    <div className="text-xs text-ink-400 dark:text-ink-500">{new Date(o.created_at).toLocaleDateString()}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ReopenModal({ order, onClose, onReopened }) {
   const [confirmText, setConfirmText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -545,6 +627,7 @@ export default function Delivery() {
   const [toCancel, setToCancel] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
   const [toReopen, setToReopen] = useState(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -601,6 +684,9 @@ export default function Delivery() {
               <option value="cancelled">Cancelados</option>
               <option value="all">Todos</option>
             </select>
+            <button onClick={() => setHistoryOpen(true)} className="btn-secondary h-9">
+              <Clock size={16}/> Historial
+            </button>
             <button onClick={() => setOpenNew(true)} className="btn-primary">
               <Plus size={16}/> Nuevo pedido
             </button>
@@ -657,6 +743,7 @@ export default function Delivery() {
         </div>
       )}
 
+      {historyOpen && <HistoryModal onClose={() => setHistoryOpen(false)} />}
       {openNew && <NewOrderModal onClose={() => setOpenNew(false)} onCreated={onCreated} />}
       {toAssign && <AssignModal order={toAssign} onClose={() => setToAssign(null)} onAssigned={load} />}
       {toView && <OrderDetailModal order={toView} onClose={() => setToView(null)} onChanged={load} />}

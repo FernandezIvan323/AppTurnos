@@ -12,6 +12,7 @@ import Menu from "./pages/admin/Menu";
 import Staff from "./pages/admin/Staff";
 import Reports from "./pages/admin/Reports";
 import Expenses from "./pages/admin/Expenses";
+import Inventory from "./pages/admin/Inventory";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/admin/expenses" element={<Expenses />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/staff" element={<Staff />} />
+        <Route path="/admin/inventory" element={<Inventory />} />
         <Route path="/reports" element={<Reports />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

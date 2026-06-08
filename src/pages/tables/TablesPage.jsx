@@ -5,7 +5,7 @@ import Header from "../../components/Header";
 import { useAuth } from "../../store/auth";
 import { money, formatTime, statusLabels, statusColors } from "../../lib/format";
 import {
-  Plus, X, Minus, CheckCircle2, Receipt, Clock, ChefHat, ArrowLeft, Utensils,
+  Plus, X, Minus, CheckCircle2, Receipt, Clock, ChefHat, ArrowLeft, Utensils, History,
 } from "lucide-react";
 
 function timeAgo(iso) {
@@ -188,11 +188,81 @@ function OrderModal({ table, onClose, onChanged, onGoCashier }) {
   );
 }
 
+function TableHistoryModal({ onClose }) {
+  const [tables, setTables] = useState([]);
+  const [selectedTable, setSelectedTable] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => { api.get("/tables").then((r) => setTables(r.data)); }, []);
+
+  const loadHistory = async (t) => {
+    setSelectedTable(t);
+    setLoading(true);
+    try {
+      const { data } = await api.get(`/orders/table-history/${t.id}`);
+      setHistory(data);
+    } catch {} finally { setLoading(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+      <div className="card w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div className="px-5 py-4 border-b border-paper-300 dark:border-ink-800 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-ink-800 dark:text-ink-100 flex items-center gap-2">
+            <History size={18}/> Historial de mesas
+          </h2>
+          <button onClick={onClose} className="btn-ghost"><X size={18}/></button>
+        </div>
+        <div className="p-5 overflow-y-auto flex-1">
+          <div className="flex gap-2 mb-4 flex-wrap">
+            {tables.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => loadHistory(t)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition border ${
+                  selectedTable?.id === t.id
+                    ? "bg-brand-500 text-white border-brand-500 dark:bg-brandDark-500 dark:text-[#1E222B]"
+                    : "bg-paper-50 text-ink-600 border-paper-300 hover:bg-paper-200 dark:bg-[#262B36] dark:text-ink-300 dark:border-white/5 dark:hover:bg-[#2E3440]"
+                }`}
+              >
+                Mesa {t.number}
+              </button>
+            ))}
+          </div>
+          {!selectedTable && <div className="text-sm text-ink-400 dark:text-ink-500 text-center py-8">Selecciona una mesa para ver su historial</div>}
+          {loading && <div className="text-sm text-ink-500 dark:text-ink-400">Cargando…</div>}
+          {selectedTable && !loading && history.length === 0 && (
+            <div className="text-sm text-ink-400 dark:text-ink-500 text-center py-8">Mesa {selectedTable.number} no tiene pedidos previos.</div>
+          )}
+          {selectedTable && !loading && history.length > 0 && (
+            <div className="space-y-2">
+              {history.map((o) => (
+                <div key={o.id} className="flex items-center justify-between card p-3 text-sm">
+                  <div>
+                    <div className="font-medium text-ink-800 dark:text-ink-100">#{o.id}</div>
+                    <div className="text-xs text-ink-500 dark:text-ink-400">{o.user_name && `por ${o.user_name}`} · {o.closed_at ? new Date(o.closed_at).toLocaleDateString() : new Date(o.created_at).toLocaleDateString()}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold text-ink-700 dark:text-ink-200">{money(o.total)}</div>
+                    <span className={`badge text-[10px] ${statusColors[o.status]} dark:opacity-80`}>{statusLabels[o.status]}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TablesPage() {
   const { user } = useAuth();
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
   const nav = useNavigate();
 
   const load = async () => {
@@ -211,6 +281,11 @@ export default function TablesPage() {
           user?.role === "waiter"
             ? "Toca una mesa para abrir o agregar a la cuenta"
             : "Estado de las mesas en tiempo real"
+        }
+        right={
+          <button onClick={() => setShowHistory(true)} className="btn-secondary h-9">
+            <History size={16}/> Historial
+          </button>
         }
       />
 
@@ -304,6 +379,7 @@ export default function TablesPage() {
           onGoCashier={() => { setSelected(null); nav("/cashier"); }}
         />
       )}
+      {showHistory && <TableHistoryModal onClose={() => setShowHistory(false)} />}
     </div>
   );
 }

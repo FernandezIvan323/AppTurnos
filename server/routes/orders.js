@@ -354,4 +354,16 @@ router.post("/:id/reopen", authRequired, requireRole("admin"), async (req, res) 
   }
 });
 
+router.get("/table-history/:table_id", authRequired, async (req, res) => {
+  const { rows } = await query(
+    `SELECT o.id, o.status, o.total, o.created_at, o.closed_at, u.name AS user_name
+     FROM orders o
+     LEFT JOIN users u ON u.id = o.user_id
+     WHERE o.table_id = $1 AND o.type = 'table'
+     ORDER BY o.created_at DESC LIMIT 20`,
+    [req.params.table_id]
+  );
+  res.json(rows);
+});
+
 export default router;

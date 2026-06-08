@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../store/auth";
+import LogoutConfirm from "./LogoutConfirm";
 import {
   LayoutDashboard,
   Truck,
@@ -12,6 +14,7 @@ import {
   BookOpen,
   ScrollText,
   TrendingDown,
+  Package,
 } from "lucide-react";
 
 const items = [
@@ -24,6 +27,7 @@ const items = [
   { to: "/admin/expenses",  label: "Gastos",      icon: TrendingDown,    roles: ["admin"] },
   { to: "/customers",    label: "Clientes",       icon: Users,           roles: ["admin"] },
   { to: "/staff",        label: "Personal",       icon: LayoutDashboard, roles: ["admin"] },
+  { to: "/admin/inventory", label: "Inventario",   icon: Package,         roles: ["admin"] },
   { to: "/reports",      label: "Reportes",       icon: BarChart3,       roles: ["admin"] },
 ];
 
@@ -36,6 +40,7 @@ const labelFor = (it, role) => {
 export default function Sidebar() {
   const { user, logout } = useAuth();
   const nav = useNavigate();
+  const [showLogout, setShowLogout] = useState(false);
   if (!user) return null;
 
   return (
@@ -93,15 +98,18 @@ export default function Sidebar() {
           )}
         </div>
         <button
-          onClick={() => {
-            logout();
-            nav("/login");
-          }}
+          onClick={() => setShowLogout(true)}
           className="btn-ghost w-full justify-start mt-1"
         >
           <LogOut size={16} /> Cerrar sesión
         </button>
       </div>
+      {showLogout && (
+        <LogoutConfirm
+          onConfirm={() => { logout(); nav("/login"); }}
+          onCancel={() => setShowLogout(false)}
+        />
+      )}
     </aside>
   );
 }

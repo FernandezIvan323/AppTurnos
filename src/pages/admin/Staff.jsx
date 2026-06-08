@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import api from "../../lib/api";
 import Header from "../../components/Header";
 import { useAuth } from "../../store/auth";
-import { Plus, Edit2, Trash2, X, Bike, Utensils, UserCog, Check, PlusCircle, XCircle } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Bike, Utensils, UserCog, Check, PlusCircle, XCircle, UserPlus } from "lucide-react";
 
 function Tabs({ value, onChange }) {
   const tabs = [
     { v: "delivery",     l: "Repartidores", icon: Bike },
+    { v: "waiters",      l: "Meseros",      icon: UserPlus },
     { v: "tables",       l: "Mesas",        icon: Utensils },
-    { v: "assignments",  l: "Asignaciones", icon: UserCog },
+    { v: "assignments",  l: "Asignar",      icon: UserCog },
   ];
   return (
-    <div className="flex gap-1 bg-paper-50 dark:bg-ink-900 border border-paper-300 dark:border-ink-700 rounded-xl p-1">
+    <div className="flex gap-1 bg-paper-50 dark:bg-ink-900 border border-paper-300 dark:border-ink-700 rounded-xl p-1 flex-wrap">
       {tabs.map((t) => (
         <button
           key={t.v}
@@ -199,6 +200,50 @@ function AddTableModal({ waiter, availableTables, onClose, onAssigned }) {
   );
 }
 
+function WaiterModal({ onClose, onSaved }) {
+  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
+  const [pin, setPin] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState(null);
+  const save = async () => {
+    setSaving(true); setErr(null);
+    try {
+      await api.post("/auth/users", { username, name, pin, role: "waiter" });
+      onSaved(); onClose();
+    } catch (e) {
+      setErr(e.response?.data?.error || e.message);
+    } finally { setSaving(false); }
+  };
+  return (
+    <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+      <div className="card w-full max-w-md p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-ink-800 dark:text-ink-100">Nuevo mesero</h2>
+          <button onClick={onClose} className="btn-ghost"><X size={18}/></button>
+        </div>
+        <label className="label">Usuario</label>
+        <input className="input" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} autoFocus autoComplete="off" />
+        <label className="label mt-3">Nombre completo</label>
+        <input className="input" value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" />
+        <label className="label mt-3">PIN (4 dígitos)</label>
+        <input className="input" type="password" maxLength={4} inputMode="numeric" pattern="[0-9]*" value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} autoComplete="new-password" />
+        {err && (
+          <div className="mt-3 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800">
+            {err}
+          </div>
+        )}
+        <div className="mt-4 flex justify-end gap-2">
+          <button onClick={onClose} className="btn-secondary">Cancelar</button>
+          <button onClick={save} disabled={saving || !username || !name || pin.length !== 4} className="btn-primary">
+            {saving ? "Guardando…" : "Crear mesero"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AssignmentsTab() {
   const [assignments, setAssignments] = useState([]);
   const [tables, setTables] = useState([]);
@@ -298,13 +343,14 @@ export default function Staff() {
   const { user } = useAuth();
   const [tab, setTab] = useState("delivery");
   const [delivery, setDelivery] = useState([]);
+  const [waiters, setWaiters] = useState([]);
   const [tables, setTables] = useState([]);
   const [editing, setEditing] = useState(null);
   const [creating, setCreating] = useState(false);
 
   const load = async () => {
-    const [d, t] = await Promise.all([api.get("/delivery"), api.get("/tables")]);
-    setDelivery(d.data); setTables(t.data);
+    const [d, w, t] = await Promise.all([api.get("/delivery"), api.get("/auth/users"), api.get("/tables")]);
+    setDelivery(d.data); setWaiters(w.data.filter((u) => u.role === "waiter")); setTables(t.data);
   };
   useEffect(() => { load(); }, []);
 
@@ -366,6 +412,34 @@ export default function Staff() {
         </div>
       )}
 
+      {tab === "waiters" && (
+        <div className="card overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-paper-200 dark:bg-ink-800 text-ink-600 dark:text-ink-300 text-left">
+              <tr>
+                <th className="px-4 py-2 font-medium">Usuario</th>
+                <th className="px-4 py-2 font-medium">Nombre</th>
+                <th className="px-4 py-2 font-medium">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {waiters.map((w) => (
+                <tr key={w.id} className="border-t border-paper-200 dark:border-ink-800">
+                  <td className="px-4 py-2 font-mono text-ink-700 dark:text-ink-200">@{w.username}</td>
+                  <td className="px-4 py-2 font-medium text-ink-800 dark:text-ink-100">{w.name}</td>
+                  <td className="px-4 py-2">
+                    <span className={`badge ${w.active ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" : "bg-slate-100 text-slate-600 dark:bg-ink-800 dark:text-ink-400"}`}>
+                      {w.active ? "Activo" : "Inactivo"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {waiters.length === 0 && <tr><td colSpan={3} className="px-4 py-6 text-center text-ink-400 dark:text-ink-500">No hay meseros registrados. Crea uno con "Nuevo".</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {tab === "tables" && (
         <div className="card overflow-hidden">
           <table className="w-full text-sm">
@@ -403,6 +477,7 @@ export default function Staff() {
       {tab === "assignments" && <AssignmentsTab />}
 
       {creating && tab === "delivery" && <DeliveryModal onClose={() => setCreating(false)} onSaved={load} />}
+      {creating && tab === "waiters" && <WaiterModal onClose={() => setCreating(false)} onSaved={load} />}
       {creating && tab === "tables" && <TableModal onClose={() => setCreating(false)} onSaved={load} />}
       {editing?.type === "delivery" && <DeliveryModal person={editing.value} onClose={() => setEditing(null)} onSaved={load} />}
       {editing?.type === "table" && <TableModal table={editing.value} onClose={() => setEditing(null)} onSaved={load} />}

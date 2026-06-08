@@ -5,7 +5,7 @@ import BarChart from "../../components/BarChart";
 import { money } from "../../lib/format";
 import {
   DollarSign, TrendingUp, TrendingDown, ShoppingBag, Truck, Award,
-  Clock, Users as UsersIcon, AlertCircle, Tag, Bike, Calendar,
+  Clock, Users as UsersIcon, AlertCircle, Tag, Calendar,
 } from "lucide-react";
 
 function RangePicker({ value, onChange }) {
@@ -101,20 +101,18 @@ export default function Reports() {
   const [peakHours, setPeakHours] = useState([]);
   const [topCustomers, setTopCustomers] = useState([]);
   const [neverSold, setNeverSold] = useState([]);
-  const [deliveryByPerson, setDeliveryByPerson] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
     setLoading(true);
     try {
-      const [s, tp, bc, ph, tc, ns, dbp] = await Promise.all([
+      const [s, tp, bc, ph, tc, ns] = await Promise.all([
         api.get("/reports/sales", { params: range }),
         api.get("/reports/top-products", { params: { ...range, by: "qty", limit: 10 } }),
         api.get("/reports/by-category", { params: range }),
         api.get("/reports/peak-hours", { params: range }),
         api.get("/reports/top-customers", { params: { ...range, limit: 10 } }),
         api.get("/reports/never-sold"),
-        api.get("/reports/delivery-by-person", { params: range }),
       ]);
       setSales(s.data);
       setTopProducts(tp.data);
@@ -122,7 +120,6 @@ export default function Reports() {
       setPeakHours(ph.data);
       setTopCustomers(tc.data);
       setNeverSold(ns.data);
-      setDeliveryByPerson(dbp.data);
     } finally {
       setLoading(false);
     }
@@ -237,7 +234,7 @@ export default function Reports() {
                       <th className="py-2 pr-3 font-medium">#</th>
                       <th className="py-2 pr-3 font-medium">Producto</th>
                       <th className="py-2 pr-3 font-medium">Categoría</th>
-                      <th className="py-2 pr-3 font-medium text-right">Unidades</th>
+                      <th className="py-2 pr-3 font-medium text-right">Cantidad</th>
                       <th className="py-2 pr-3 font-medium text-right">Pedidos</th>
                       <th className="py-2 pl-3 font-medium text-right">Ingresos</th>
                     </tr>
@@ -314,32 +311,6 @@ export default function Reports() {
                       </div>
                       <div className="text-right">
                         <div className="font-semibold text-brand-700 dark:text-brand-300">{money(c.total_spent)}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Domicilios por repartidor */}
-            <div className="card p-5">
-              <h3 className="font-semibold text-ink-700 dark:text-ink-200 mb-1 flex items-center gap-2">
-                <Bike size={16}/> Domicilios por repartidor
-              </h3>
-              <p className="text-xs text-ink-500 dark:text-ink-400 mb-3">Cantidad de entregas y ganancia generada</p>
-              {deliveryByPerson.length === 0 ? (
-                <div className="text-sm text-ink-400 dark:text-ink-500 text-center py-4">Sin repartidores.</div>
-              ) : (
-                <div className="space-y-1.5">
-                  {deliveryByPerson.map((p) => (
-                    <div key={p.id} className="flex items-center justify-between text-sm py-1.5 border-b border-paper-200 dark:border-ink-800 last:border-0">
-                      <div>
-                        <div className="font-medium text-ink-800 dark:text-ink-100">{p.name}</div>
-                        <div className="text-xs text-ink-500 dark:text-ink-400">{p.phone || "—"}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-semibold text-ink-800 dark:text-ink-100">{p.deliveries} entregas</div>
-                        <div className="text-xs text-brand-700 dark:text-brand-300">{money(p.revenue)}</div>
                       </div>
                     </div>
                   ))}

@@ -126,6 +126,22 @@ export async function ensureDatabase() {
 export async function runMigrations() {
   const sql = fs.readFileSync(path.join(__dirname, "schema.sql"), "utf8");
   await pool.query(sql);
+
+  // Inventory/stock columns (added after initial schema)
+  await pool.query(`
+    ALTER TABLE products ADD COLUMN IF NOT EXISTS stock NUMERIC(10,2) NOT NULL DEFAULT 0;
+    ALTER TABLE products ADD COLUMN IF NOT EXISTS min_stock NUMERIC(10,2) NOT NULL DEFAULT 0;
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS stock_movements (
+      id         SERIAL PRIMARY KEY,
+      product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+      type       VARCHAR(20) NOT NULL CHECK (type IN ('entry','exit','adjustment')),
+      quantity   NUMERIC(10,2) NOT NULL,
+      reason     TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
   console.log("[db] Migraciones aplicadas.");
 }
 

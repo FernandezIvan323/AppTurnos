@@ -22,36 +22,30 @@ export default function Login() {
 
   const submit = async (e) => {
     e?.preventDefault();
-    if (!username || pin.length !== PIN_LENGTH) return;
+    if (!username || pin.length !== PIN_LENGTH || loading) return;
     try {
       await login(username, pin);
     } catch {
-      /* error queda en el store */
+      setPin("");
     }
   };
 
   const addDigit = (d) => {
-    if (pin.length >= PIN_LENGTH) return;
-    const next = pin + d;
-    setPin(next);
-    if (next.length === PIN_LENGTH) {
-      setTimeout(() => {
-        login(username, next).catch(() => setPin(""));
-      }, 120);
-    }
+    if (pin.length >= PIN_LENGTH || loading) return;
+    setPin((p) => p + d);
   };
   const backspace = () => setPin((p) => p.slice(0, -1));
   const clear = () => setPin("");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-paper-100 to-paper-200 dark:from-ink-950 dark:to-ink-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md card p-8">
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-24 h-24 rounded-3xl bg-paper-50 dark:bg-ink-800 border border-paper-200 dark:border-ink-700 flex items-center justify-center shadow-soft p-3">
+    <div className="min-h-screen bg-gradient-to-br from-paper-100 to-paper-300 dark:from-[#1E222B] dark:to-[#262B36] flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-28 h-28 rounded-3xl bg-paper-50 dark:bg-[#262B36] border border-paper-200 dark:border-white/5 flex items-center justify-center shadow-soft dark:shadow-none p-4">
             <img src="/favicon.svg" alt="AppTurnos" className="w-full h-full" />
           </div>
-          <h1 className="mt-4 text-xl font-semibold text-ink-800 dark:text-ink-100">AppTurnos</h1>
-          <p className="text-sm text-ink-500 dark:text-ink-400">Ingresa tu usuario y PIN</p>
+          <h1 className="mt-5 text-2xl font-bold text-ink-800 dark:text-white">AppTurnos</h1>
+          <p className="text-sm text-ink-500 dark:text-ink-400 mt-1">Ingresa tu usuario y PIN</p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
@@ -59,24 +53,25 @@ export default function Login() {
             <label className="label">Usuario</label>
             <input
               ref={inputRef}
-              className="input"
+              className="input text-center text-lg"
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase())}
               autoComplete="username"
               placeholder="admin o ivan"
+              disabled={loading}
             />
           </div>
 
           <div>
-            <label className="label">PIN de {PIN_LENGTH} dígitos</label>
-            <div className="flex justify-center gap-3 my-2">
+            <label className="label text-center">PIN de {PIN_LENGTH} dígitos</label>
+            <div className="flex justify-center gap-3 my-3">
               {Array.from({ length: PIN_LENGTH }).map((_, i) => (
                 <div
                   key={i}
                   className={`w-12 h-14 rounded-xl border-2 flex items-center justify-center text-2xl font-semibold transition ${
                     pin[i]
-                      ? "border-brand-500 text-brand-700 bg-brand-50 dark:bg-brand-900/40 dark:text-brand-300"
-                      : "border-paper-300 bg-paper-50 text-ink-300 dark:bg-ink-900 dark:border-ink-700 dark:text-ink-600"
+                      ? "border-brand-500 text-brand-700 bg-brand-50 dark:border-brandDark-500 dark:text-brandDark-300 dark:bg-brandDark-900/40"
+                      : "border-paper-300 bg-paper-50 text-ink-300 dark:bg-[#1E222B] dark:border-white/10 dark:text-ink-600"
                   }`}
                 >
                   {pin[i] ? "•" : ""}
@@ -85,13 +80,14 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2.5">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
               <button
                 type="button"
                 key={d}
                 onClick={() => addDigit(String(d))}
-                className="h-14 rounded-xl bg-paper-50 border border-paper-300 text-xl font-semibold text-ink-700 hover:bg-paper-200 active:scale-95 transition dark:bg-ink-900 dark:border-ink-700 dark:text-ink-200 dark:hover:bg-ink-800"
+                disabled={loading}
+                className="h-14 rounded-xl bg-paper-50 border border-paper-300 text-xl font-semibold text-ink-700 hover:bg-paper-200 active:scale-95 transition disabled:opacity-50 dark:bg-[#262B36] dark:border-white/5 dark:text-white dark:hover:bg-[#2E3440]"
               >
                 {d}
               </button>
@@ -99,6 +95,7 @@ export default function Login() {
             <button
               type="button"
               onClick={clear}
+              disabled={loading}
               className="h-14 rounded-xl bg-paper-200 text-ink-600 font-medium hover:bg-paper-300 dark:bg-ink-800 dark:text-ink-300 dark:hover:bg-ink-700"
             >
               C
@@ -106,16 +103,18 @@ export default function Login() {
             <button
               type="button"
               onClick={() => addDigit("0")}
-              className="h-14 rounded-xl bg-paper-50 border border-paper-300 text-xl font-semibold text-ink-700 hover:bg-paper-200 active:scale-95 transition dark:bg-ink-900 dark:border-ink-700 dark:text-ink-200 dark:hover:bg-ink-800"
+              disabled={loading}
+              className="h-14 rounded-xl bg-paper-50 border border-paper-300 text-xl font-semibold text-ink-700 hover:bg-paper-200 active:scale-95 transition disabled:opacity-50 dark:bg-[#262B36] dark:border-white/5 dark:text-white dark:hover:bg-[#2E3440]"
             >
               0
             </button>
             <button
               type="button"
               onClick={backspace}
-              className="h-14 rounded-xl bg-paper-200 text-ink-600 font-medium hover:bg-paper-300 dark:bg-ink-800 dark:text-ink-300 dark:hover:bg-ink-700"
+              disabled={loading || pin.length === 0}
+              className="h-14 rounded-xl bg-paper-200 text-ink-600 font-medium hover:bg-paper-300 disabled:opacity-30 dark:bg-ink-800 dark:text-ink-300 dark:hover:bg-ink-700 flex items-center justify-center"
             >
-              <Delete size={20} className="mx-auto" />
+              <Delete size={22} />
             </button>
           </div>
 
@@ -128,13 +127,13 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading || pin.length !== PIN_LENGTH}
-            className="btn-primary w-full h-12"
+            className="btn-primary w-full h-12 text-base"
           >
             {loading ? "Verificando…" : "Entrar"}
           </button>
 
-          <div className="text-xs text-ink-500 dark:text-ink-400 text-center pt-2 border-t border-paper-200 dark:border-ink-800">
-            <div className="font-medium text-ink-600 dark:text-ink-300">Cuentas de prueba</div>
+          <div className="text-xs text-ink-500 dark:text-ink-400 text-center pt-3 border-t border-paper-200 dark:border-white/5">
+            <div className="font-medium text-ink-600 dark:text-ink-300 mb-0.5">Cuentas de prueba</div>
             <div>admin / 1234 · ivan / 0000 · maria / 0000</div>
           </div>
         </form>

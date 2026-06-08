@@ -14,6 +14,7 @@ import reportsRoutes from "./routes/reports.js";
 import assignmentsRoutes from "./routes/assignments.js";
 import cashClosingsRoutes from "./routes/cashClosings.js";
 import expensesRoutes from "./routes/expenses.js";
+import inventoryRoutes from "./routes/inventory.js";
 
 const app = express();
 app.use(cors());
@@ -33,6 +34,7 @@ app.use("/api/reports", reportsRoutes);
 app.use("/api/assignments", assignmentsRoutes);
 app.use("/api/cash-closings", cashClosingsRoutes);
 app.use("/api/expenses", expensesRoutes);
+app.use("/api/inventory", inventoryRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

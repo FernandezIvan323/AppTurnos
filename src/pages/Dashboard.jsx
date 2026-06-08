@@ -8,7 +8,7 @@ import { todayLocalISO } from "../lib/date";
 import {
   DollarSign, ShoppingBag, Truck, Utensils, Receipt, Clock,
   PackageCheck, Bike, AlertCircle, RefreshCw, TrendingUp, TrendingDown,
-  ChefHat, CheckCircle2, BookOpen, ArrowRight,
+  ChefHat, CheckCircle2, BookOpen, ArrowRight, Package,
 } from "lucide-react";
 
 function Stat({ icon: Icon, label, value, hint, color = "bg-brand-50 text-brand-700", darkColor = "dark:bg-brand-900/30 dark:text-brand-300" }) {
@@ -43,16 +43,19 @@ function Trend({ current, previous }) {
 function AdminDashboard() {
   const [data, setData] = useState(null);
   const [expensesData, setExpensesData] = useState(null);
+  const [lowStockCount, setLowStockCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const load = async () => {
     setLoading(true);
     try {
-      const [{ data }, { data: exp }] = await Promise.all([
+      const [{ data }, { data: exp }, { data: inv }] = await Promise.all([
         api.get("/dashboard/summary"),
         api.get("/expenses/summary", { params: { date: todayLocalISO() } }),
+        api.get("/inventory"),
       ]);
       setData(data);
       setExpensesData(exp);
+      setLowStockCount(inv.filter((p) => p.low_stock).length);
     } finally { setLoading(false); }
   };
   useEffect(() => {
@@ -136,6 +139,14 @@ function AdminDashboard() {
           </div>
           <div className="text-2xl font-bold text-ink-800 dark:text-ink-100">{o.ready_to_pay || 0}</div>
           <div className="text-[11px] text-ink-400 dark:text-ink-500 mt-1">Cuentas listas</div>
+        </Link>
+        <Link to="/admin/inventory" className="card p-4 hover:shadow-pop transition group">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 flex items-center justify-center"><Package size={18} /></div>
+            <span className="text-xs text-ink-500 dark:text-ink-400">Stock bajo</span>
+          </div>
+          <div className="text-2xl font-bold text-ink-800 dark:text-ink-100">{lowStockCount}</div>
+          <div className="text-[11px] text-ink-400 dark:text-ink-500 mt-1">Productos por reordenar</div>
         </Link>
       </div>
       <div className="card p-6 text-sm text-ink-500 dark:text-ink-400">

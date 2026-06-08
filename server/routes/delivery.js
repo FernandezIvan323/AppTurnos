@@ -6,7 +6,24 @@ const router = Router();
 
 router.get("/", authRequired, async (_req, res) => {
   const { rows } = await query(
-    "SELECT id, name, phone, status FROM delivery_persons ORDER BY name"
+    `SELECT dp.id, dp.name, dp.phone, dp.status,
+       (SELECT COUNT(*) FROM orders o WHERE o.delivery_person_id = dp.id AND o.status = 'on_the_way')::int AS active_orders
+     FROM delivery_persons dp ORDER BY dp.name`
+  );
+  res.json(rows);
+});
+
+router.get("/history", authRequired, requireRole("admin"), async (req, res) => {
+  const { delivery_person_id, limit = 50 } = req.query;
+  if (!delivery_person_id) return res.status(400).json({ error: "delivery_person_id requerido" });
+  const { rows } = await query(
+    `SELECT o.id, o.created_at, o.customer_name, o.customer_address,
+            o.total, o.payment_method, o.status
+     FROM orders o
+     WHERE o.delivery_person_id = $1 AND o.type = 'delivery'
+     ORDER BY o.created_at DESC
+     LIMIT $2`,
+    [delivery_person_id, limit]
   );
   res.json(rows);
 });
