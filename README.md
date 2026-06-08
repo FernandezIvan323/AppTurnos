@@ -7,7 +7,7 @@
 
 # AppTurnos 🍔
 
-> Sistema de gestión integral para restaurant con acera, mesas y pedidos a domicilio.
+> Sistema de gestión integral para restaurant con mesas y pedidos a domicilio.
 
 AppTurnos nació para resolver el caos de los pedidos a domicilio de un restaurant de acera: registro de llamadas, asignación de repartidores, seguimiento de pedidos en tiempo real, control de mesas, caja con corte diario, catálogo de productos, inventario y reportes de ventas.
 
