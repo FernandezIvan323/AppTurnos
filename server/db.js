@@ -87,7 +87,8 @@ export async function withTransaction(fn) {
   const client = await pool.connect();
   let txStarted = false;
   try {
-    await client.query("SET timezone = $1", [DB_TZ]);
+    if (!/^[\w\/]+$/.test(DB_TZ)) throw new Error(`Timezone inválido: ${DB_TZ}`);
+    await client.query(`SET timezone = '${DB_TZ}'`);
     await client.query("BEGIN");
     txStarted = true;
     const result = await fn(client);
@@ -106,7 +107,7 @@ export async function withTransaction(fn) {
     }
     throw e;
   } finally {
-    client.release();
+    client?.release();
   }
 }
 

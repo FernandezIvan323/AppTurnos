@@ -53,7 +53,7 @@ function DeliveryModal({ person, onClose, onSaved }) {
         </div>
         <label className="label">Nombre</label>
         <input className="input" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
-        <label className="label mt-3">TelÃ©fono</label>
+        <label className="label mt-3">Teléfono</label>
         <input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} />
         {person && (
           <>
@@ -72,7 +72,7 @@ function DeliveryModal({ person, onClose, onSaved }) {
         )}
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="btn-secondary">Cancelar</button>
-          <button onClick={save} disabled={saving} className="btn-primary">{saving ? "Guardandoâ€¦" : "Guardar"}</button>
+          <button onClick={save} disabled={saving} className="btn-primary">{saving ? "Guardando…" : "Guardar"}</button>
         </div>
       </div>
     </div>
@@ -105,10 +105,10 @@ function TableModal({ table, onClose, onSaved }) {
           <h2 className="text-lg font-semibold text-ink-800 dark:text-obsidian-50">{table ? "Editar" : "Nueva"} mesa</h2>
           <button onClick={onClose} className="btn-ghost"><X size={18}/></button>
         </div>
-        <label className="label">NÃºmero / identificador</label>
-        <input className="input" value={form.number} onChange={(e) => setForm({...form, number: e.target.value})} placeholder="1, 2, P1, B1â€¦" />
+        <label className="label">Número / identificador</label>
+        <input className="input" value={form.number} onChange={(e) => setForm({...form, number: e.target.value})} placeholder="1, 2, P1, B1…" />
         <label className="label mt-3">Etiqueta (opcional)</label>
-        <input className="input" value={form.label} onChange={(e) => setForm({...form, label: e.target.value})} placeholder="Patio 1, Barra 2â€¦" />
+        <input className="input" value={form.label} onChange={(e) => setForm({...form, label: e.target.value})} placeholder="Patio 1, Barra 2…" />
         <label className="label mt-3">Capacidad</label>
         <input className="input" type="number" value={form.capacity} onChange={(e) => setForm({...form, capacity: e.target.value})} />
         <label className="flex items-center gap-2 text-sm text-ink-600 dark:text-obsidian-200 mt-3">
@@ -122,7 +122,7 @@ function TableModal({ table, onClose, onSaved }) {
         )}
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="btn-secondary">Cancelar</button>
-          <button onClick={save} disabled={saving} className="btn-primary">{saving ? "Guardandoâ€¦" : "Guardar"}</button>
+          <button onClick={save} disabled={saving} className="btn-primary">{saving ? "Guardando…" : "Guardar"}</button>
         </div>
       </div>
     </div>
@@ -158,7 +158,7 @@ function AddTableModal({ waiter, availableTables, onClose, onAssigned }) {
         <p className="text-sm text-ink-500 dark:text-obsidian-400 mb-3">Selecciona las mesas (toca para marcar). Las mesas ya asignadas a otro mesero no aparecen.</p>
         {availableTables.length === 0 ? (
           <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">
-            No hay mesas disponibles para asignar (todas estÃ¡n asignadas a otros meseros).
+            No hay mesas disponibles para asignar (todas están asignadas a otros meseros).
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -192,7 +192,7 @@ function AddTableModal({ waiter, availableTables, onClose, onAssigned }) {
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="btn-secondary">Cancelar</button>
           <button onClick={save} disabled={saving || availableTables.length === 0} className="btn-primary">
-            {saving ? "Asignandoâ€¦" : `Asignar ${selected.size > 0 ? `(${selected.size})` : ""}`}
+            {saving ? "Asignando…" : `Asignar ${selected.size > 0 ? `(${selected.size})` : ""}`}
           </button>
         </div>
       </div>
@@ -226,7 +226,7 @@ function WaiterModal({ onClose, onSaved }) {
         <input className="input" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase())} autoFocus autoComplete="off" />
         <label className="label mt-3">Nombre completo</label>
         <input className="input" value={name} onChange={(e) => setName(e.target.value)} autoComplete="off" />
-        <label className="label mt-3">PIN (4 dÃ­gitos)</label>
+        <label className="label mt-3">PIN (4 dígitos)</label>
         <input className="input" type="password" maxLength={4} inputMode="numeric" pattern="[0-9]*" value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} autoComplete="new-password" />
         {err && (
           <div className="mt-3 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800">
@@ -236,7 +236,7 @@ function WaiterModal({ onClose, onSaved }) {
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="btn-secondary">Cancelar</button>
           <button onClick={save} disabled={saving || !username || !name || pin.length !== 4} className="btn-primary">
-            {saving ? "Guardandoâ€¦" : "Crear mesero"}
+            {saving ? "Guardando…" : "Crear mesero"}
           </button>
         </div>
       </div>
@@ -275,7 +275,7 @@ function AssignmentsTab() {
       {assignments.length === 0 ? (
         <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">
           <UserCog size={32} className="mx-auto text-ink-300 dark:text-obsidian-300 mb-2"/>
-          No hay meseros activos. Crea uno primero desde otro sistema o vÃ­a SQL.
+          No hay meseros activos. Crea uno primero desde otro sistema o vía SQL.
         </div>
       ) : (
         assignments.map((w) => (
@@ -301,7 +301,7 @@ function AssignmentsTab() {
             </div>
             {w.tables.length === 0 ? (
               <div className="text-sm text-ink-400 dark:text-obsidian-500 italic ml-11">
-                Sin mesas asignadas â€” el mesero no podrÃ¡ tomar pedidos.
+                Sin mesas asignadas — el mesero no podrá tomar pedidos.
               </div>
             ) : (
               <div className="flex flex-wrap gap-2 ml-11">
@@ -310,7 +310,7 @@ function AssignmentsTab() {
                     key={t.id}
                     className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-100 text-brand-800 text-sm font-medium dark:bg-wine-900/40 dark:text-wine-300"
                   >
-                    Mesa {t.number}{t.label ? ` Â· ${t.label}` : ""}
+                    Mesa {t.number}{t.label ? ` · ${t.label}` : ""}
                     <button
                       onClick={() => removeOne(w.user_id, t.id)}
                       className="ml-1 hover:text-rose-600 dark:hover:text-rose-400"
@@ -355,14 +355,14 @@ export default function Staff() {
   useEffect(() => { load(); }, []);
 
   if (user?.role !== "admin") {
-    return <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Esta secciÃ³n es solo para el administrador.</div>;
+    return <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Esta sección es solo para el administrador.</div>;
   }
 
   return (
     <div>
       <Header
         title="Personal y mesas"
-        subtitle="GestiÃ³n de repartidores, mesas y asignaciones"
+        subtitle="Gestión de repartidores, mesas y asignaciones"
         right={
           <div className="flex items-center gap-2">
             <Tabs value={tab} onChange={setTab} />
@@ -381,7 +381,7 @@ export default function Staff() {
             <thead className="bg-paper-200 dark:bg-obsidian-800 text-ink-600 dark:text-obsidian-200 text-left">
               <tr>
                 <th className="px-4 py-2 font-medium">Nombre</th>
-                <th className="px-4 py-2 font-medium">TelÃ©fono</th>
+                <th className="px-4 py-2 font-medium">Teléfono</th>
                 <th className="px-4 py-2 font-medium">Estado</th>
                 <th className="px-4 py-2 font-medium w-32 text-right">Acciones</th>
               </tr>
@@ -390,7 +390,7 @@ export default function Staff() {
               {delivery.map((p) => (
                 <tr key={p.id} className="border-t border-paper-200 dark:border-obsidian-800">
                   <td className="px-4 py-2 font-medium text-ink-800 dark:text-obsidian-50">{p.name}</td>
-                  <td className="px-4 py-2 text-ink-600 dark:text-obsidian-200">{p.phone || "â€”"}</td>
+                  <td className="px-4 py-2 text-ink-600 dark:text-obsidian-200">{p.phone || "—"}</td>
                   <td className="px-4 py-2">
                     <span className={`badge ${
                       p.status === "available" ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300" :
@@ -402,7 +402,7 @@ export default function Staff() {
                   </td>
                   <td className="px-4 py-2 text-right">
                     <button onClick={() => setEditing({ type: "delivery", value: p })} className="btn-ghost text-xs"><Edit2 size={14}/></button>
-                    <button onClick={async () => { if (confirm(`Â¿Eliminar a ${p.name}?`)) { await api.delete(`/delivery/${p.id}`); load(); } }} className="btn-ghost text-xs text-rose-600 dark:text-rose-400"><Trash2 size={14}/></button>
+                    <button onClick={async () => { if (confirm(`¿Eliminar a ${p.name}?`)) { await api.delete(`/delivery/${p.id}`); load(); } }} className="btn-ghost text-xs text-rose-600 dark:text-rose-400"><Trash2 size={14}/></button>
                   </td>
                 </tr>
               ))}
@@ -456,7 +456,7 @@ export default function Staff() {
               {tables.map((t) => (
                 <tr key={t.id} className="border-t border-paper-200 dark:border-obsidian-800">
                   <td className="px-4 py-2 font-bold text-ink-800 dark:text-obsidian-50">{t.number}</td>
-                  <td className="px-4 py-2 text-ink-600 dark:text-obsidian-200">{t.label || "â€”"}</td>
+                  <td className="px-4 py-2 text-ink-600 dark:text-obsidian-200">{t.label || "—"}</td>
                   <td className="px-4 py-2 text-ink-600 dark:text-obsidian-200">{t.capacity}</td>
                   <td className="px-4 py-2">
                     {t.current_order_id ? <span className="badge bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">Ocupada</span>
@@ -464,7 +464,7 @@ export default function Staff() {
                   </td>
                   <td className="px-4 py-2 text-right">
                     <button onClick={() => setEditing({ type: "table", value: t })} className="btn-ghost text-xs"><Edit2 size={14}/></button>
-                    <button onClick={async () => { if (confirm(`Â¿Eliminar mesa ${t.number}?`)) { await api.delete(`/tables/${t.id}`); load(); } }} className="btn-ghost text-xs text-rose-600 dark:text-rose-400"><Trash2 size={14}/></button>
+                    <button onClick={async () => { if (confirm(`¿Eliminar mesa ${t.number}?`)) { await api.delete(`/tables/${t.id}`); load(); } }} className="btn-ghost text-xs text-rose-600 dark:text-rose-400"><Trash2 size={14}/></button>
                   </td>
                 </tr>
               ))}

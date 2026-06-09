@@ -63,7 +63,7 @@ function CloseModal({ order, mode = "close", onClose, onClosed }) {
             </div>
           )}
           <div className="text-xs text-ink-500 dark:text-obsidian-400 mt-1">
-            {order.type === "table" ? `Mesa ${order.table_number}` : `${order.customer_name} Â· ${order.customer_neighborhood || ""}`}
+            {order.type === "table" ? `Mesa ${order.table_number}` : `${order.customer_name} · ${order.customer_neighborhood || ""}`}
           </div>
           {!isPrepay && showSplit && split > 1 && (
             <div className="mt-2 pt-2 border-t border-paper-200 dark:border-obsidian-700 text-sm">
@@ -74,7 +74,7 @@ function CloseModal({ order, mode = "close", onClose, onClosed }) {
         </div>
         {isPrepay && (
           <div className="mb-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">
-            El pedido se marcarÃ¡ como pagado y seguirÃ¡ en camino. El cierre final se harÃ¡ al entregar.
+            El pedido se marcará como pagado y seguirá en camino. El cierre final se hará al entregar.
           </div>
         )}
         {!isPrepay && (
@@ -103,7 +103,7 @@ function CloseModal({ order, mode = "close", onClose, onClosed }) {
               onClick={() => setShowSplit((s) => !s)}
               className={`flex items-center gap-2 text-sm font-medium ${showSplit ? "text-brand-600 dark:text-wine-300" : "text-ink-500 dark:text-obsidian-400"}`}
             >
-              <Users size={14}/> {showSplit ? "Ocultar divisiÃ³n" : "Dividir cuenta"}
+              <Users size={14}/> {showSplit ? "Ocultar división" : "Dividir cuenta"}
             </button>
             {showSplit && (
               <div className="flex items-center gap-2 mt-2">
@@ -115,7 +115,7 @@ function CloseModal({ order, mode = "close", onClose, onClosed }) {
             )}
           </div>
         )}
-        <label className="label">MÃ©todo de pago</label>
+        <label className="label">Método de pago</label>
         <div className="grid grid-cols-2 gap-2 mb-4">
           {methods.map((m) => (
             <button
@@ -135,7 +135,7 @@ function CloseModal({ order, mode = "close", onClose, onClosed }) {
         <div className="flex gap-2">
           <button onClick={onClose} className="btn-secondary flex-1">Cancelar</button>
           <button onClick={submit} disabled={busy} className="btn-primary flex-1">
-            {busy ? "Procesandoâ€¦" : (isPrepay ? "Confirmar pre-cobro" : "Confirmar cobro")}
+            {busy ? "Procesando…" : (isPrepay ? "Confirmar pre-cobro" : "Confirmar cobro")}
           </button>
         </div>
       </div>
@@ -150,7 +150,7 @@ function OrderRow({ order, onClose, onPrepay }) {
       <div className="flex-1">
         <div className="flex items-center gap-2 text-xs text-ink-500 dark:text-obsidian-400">
           <span>#{order.id}</span>
-          <span>Â·</span>
+          <span>·</span>
           <span>{formatTime(order.created_at)}</span>
           <span className={`badge inline-flex items-center gap-1 ${
             isDelivery ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300" : "bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300"
@@ -162,8 +162,8 @@ function OrderRow({ order, onClose, onPrepay }) {
         </div>
         <div className="font-semibold text-ink-800 dark:text-obsidian-50 mt-0.5">
           {order.type === "table"
-            ? `Mesa ${order.table_number}` + (order.table_label ? ` Â· ${order.table_label}` : "")
-            : `${order.customer_name}${order.customer_neighborhood ? " Â· " + order.customer_neighborhood : ""}`}
+            ? `Mesa ${order.table_number}` + (order.table_label ? ` · ${order.table_label}` : "")
+            : `${order.customer_name}${order.customer_neighborhood ? " · " + order.customer_neighborhood : ""}`}
         </div>
         {order.notes && <div className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">Nota: {order.notes}</div>}
         {order.payment_status === "paid" && (
@@ -211,7 +211,7 @@ export default function Cashier() {
     const params = { payment: tab === "paid" ? "paid" : "pending" };
     if (typeFilter !== "all") params.type = typeFilter;
     const { data } = await api.get("/orders", { params });
-    // Ordenar por antigÃ¼edad
+    // Ordenar por antigüedad
     data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     setOrders(data);
     setLoading(false);
@@ -308,7 +308,7 @@ export default function Cashier() {
       </div>
 
       {loading ? (
-        <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargandoâ€¦</div>
+        <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargando…</div>
       ) : orders.length === 0 ? (
         <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">
           <Calculator size={32} className="mx-auto text-ink-300 dark:text-obsidian-300 mb-2"/>

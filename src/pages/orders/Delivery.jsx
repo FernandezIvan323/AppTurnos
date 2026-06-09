@@ -12,7 +12,7 @@ import {
 
 const COLUMNS = [
   { key: "pending",   title: "Pendientes",     tone: "bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800/50" },
-  { key: "preparing", title: "En preparaciÃ³n", tone: "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800/50" },
+  { key: "preparing", title: "En preparación", tone: "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800/50" },
   { key: "on_the_way",title: "En camino",      tone: "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800/50" },
   { key: "delivered", title: "Entregados",     tone: "bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800/50" },
 ];
@@ -26,10 +26,10 @@ function OrderCard({ order, onClick, onAssign, onCancel, onPreparing, onBackPend
     >
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="text-xs text-ink-400 dark:text-obsidian-500">#{order.id} Â· {formatTime(order.created_at)}</div>
+          <div className="text-xs text-ink-400 dark:text-obsidian-500">#{order.id} · {formatTime(order.created_at)}</div>
           <div className="font-semibold text-ink-800 dark:text-obsidian-50 flex items-center gap-1.5">
             <UserIcon size={14} className="text-ink-400" />
-            {order.customer_name || "â€”"}
+            {order.customer_name || "—"}
           </div>
         </div>
         <div className="text-right">
@@ -63,9 +63,9 @@ function OrderCard({ order, onClick, onAssign, onCancel, onPreparing, onBackPend
             <button
               onClick={(e) => { e.stopPropagation(); onPreparing(order); }}
               className="flex-1 h-8 px-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium flex items-center justify-center gap-1 transition"
-              title="Marcar como en preparaciÃ³n"
+              title="Marcar como en preparación"
             >
-              <ChefHat size={14}/> En preparaciÃ³n
+              <ChefHat size={14}/> En preparación
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onAssign(order); }}
@@ -102,7 +102,7 @@ function OrderCard({ order, onClick, onAssign, onCancel, onPreparing, onBackPend
         )}
         {order.status === "on_the_way" && (
           <span className="badge bg-emerald-100 text-emerald-800 w-full justify-center py-1 dark:bg-emerald-900/40 dark:text-emerald-300">
-            <CheckCircle2 size={12} className="mr-1" /> {isPaid ? "Pagado Â· listo para cerrar al entregar" : "Listo para cerrar al entregar"}
+            <CheckCircle2 size={12} className="mr-1" /> {isPaid ? "Pagado · listo para cerrar al entregar" : "Listo para cerrar al entregar"}
           </span>
         )}
         {order.status === "delivered" && (
@@ -187,8 +187,8 @@ function NewOrderModal({ onClose, onCreated }) {
   const submit = async () => {
     setError(null);
     if (cart.length === 0) return setError("Agrega al menos un producto");
-    if (!name || !phone) return setError("Nombre y telÃ©fono del cliente son requeridos");
-    if (!address) return setError("DirecciÃ³n de entrega requerida");
+    if (!name || !phone) return setError("Nombre y teléfono del cliente son requeridos");
+    if (!address) return setError("Dirección de entrega requerida");
     setSaving(true);
     try {
       let cust = customer;
@@ -224,7 +224,7 @@ function NewOrderModal({ onClose, onCreated }) {
 
             {!customer && (
               <div className="relative mb-3" ref={searchRef}>
-                <label className="label">Buscar cliente existente (nombre o telÃ©fono)</label>
+                <label className="label">Buscar cliente existente (nombre o teléfono)</label>
                 <div className="relative">
                   <Search size={14} className="absolute left-3 top-3 text-ink-400"/>
                   <input
@@ -233,7 +233,7 @@ function NewOrderModal({ onClose, onCreated }) {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onFocus={() => suggestions.length > 0 && setShowSugg(true)}
                     onBlur={() => setTimeout(() => setShowSugg(false), 180)}
-                    placeholder="Ej. Juan PÃ©rez o 555-1234â€¦"
+                    placeholder="Ej. Juan Pérez o 555-1234…"
                     autoComplete="off"
                   />
                 </div>
@@ -273,7 +273,7 @@ function NewOrderModal({ onClose, onCreated }) {
                       <Phone size={10}/> {customer.phone}
                     </div>
                   </div>
-                  <button onClick={clearCustomer} className="btn-ghost text-xs" title="Quitar selecciÃ³n">
+                  <button onClick={clearCustomer} className="btn-ghost text-xs" title="Quitar selección">
                     <X size={14}/>
                   </button>
                 </div>
@@ -286,14 +286,14 @@ function NewOrderModal({ onClose, onCreated }) {
                 <input className="input" value={name} onChange={(e) => setName(e.target.value)} disabled={!!customer} />
               </div>
               <div>
-                <label className="label">TelÃ©fono</label>
+                <label className="label">Teléfono</label>
                 <div className="relative">
                   <Phone size={14} className="absolute left-3 top-3 text-ink-400"/>
                   <input className="input pl-8" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={!!customer} />
                 </div>
               </div>
               <div>
-                <label className="label">DirecciÃ³n de entrega</label>
+                <label className="label">Dirección de entrega</label>
                 <div className="relative">
                   <MapPin size={14} className="absolute left-3 top-3 text-ink-400"/>
                   <input className="input pl-8" value={address} onChange={(e) => setAddress(e.target.value)} />
@@ -311,12 +311,12 @@ function NewOrderModal({ onClose, onCreated }) {
               </div>
               <div>
                 <label className="label">Notas de la entrega</label>
-                <textarea rows={2} className="input" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Ej. Tocar timbre 2 veces, trae cambio de 1000â€¦" />
+                <textarea rows={2} className="input" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Ej. Tocar timbre 2 veces, trae cambio de 1000…" />
               </div>
             </div>
 
             <h3 className="text-sm font-semibold text-ink-700 dark:text-obsidian-100 mt-5 mb-2">Carrito</h3>
-            {cart.length === 0 && <div className="text-sm text-ink-400 dark:text-obsidian-500">Agrega productos del menÃº â†’</div>}
+            {cart.length === 0 && <div className="text-sm text-ink-400 dark:text-obsidian-500">Agrega productos del menú →</div>}
             <div className="space-y-2">
               {cart.map((c) => (
                 <div key={c.product_id} className="flex items-center gap-2 text-sm">
@@ -343,7 +343,7 @@ function NewOrderModal({ onClose, onCreated }) {
           </div>
 
           <div className="p-5 overflow-y-auto bg-paper-100 dark:bg-obsidian-950">
-            <h3 className="text-sm font-semibold text-ink-700 dark:text-obsidian-100 mb-3">MenÃº</h3>
+            <h3 className="text-sm font-semibold text-ink-700 dark:text-obsidian-100 mb-3">Menú</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {products.map((p) => (
                 <button
@@ -351,22 +351,22 @@ function NewOrderModal({ onClose, onCreated }) {
                   onClick={() => addToCart(p)}
                   className="card p-3 text-left hover:border-brand-400 dark:hover:border-brand-600 transition"
                 >
-                  <div className="text-xs text-ink-400 dark:text-obsidian-500">{p.category_name || "Sin categorÃ­a"}</div>
+                  <div className="text-xs text-ink-400 dark:text-obsidian-500">{p.category_name || "Sin categoría"}</div>
                   <div className="font-medium text-ink-800 dark:text-obsidian-50 text-sm">{p.name}</div>
                   <div className="text-brand-700 dark:text-wine-300 font-semibold mt-1">{money(p.price)}</div>
                 </button>
               ))}
-              {products.length === 0 && <div className="text-sm text-ink-400 dark:text-obsidian-500 col-span-full">No hay productos en el menÃº. Agrega desde "MenÃº (catÃ¡logo)".</div>}
+              {products.length === 0 && <div className="text-sm text-ink-400 dark:text-obsidian-500 col-span-full">No hay productos en el menú. Agrega desde "Menú (catálogo)".</div>}
             </div>
           </div>
         </div>
 
         <div className="px-5 py-3 border-t border-paper-300 dark:border-obsidian-800 flex items-center justify-between">
-          <div className="text-sm text-ink-500 dark:text-obsidian-400">{cart.length} productos Â· {money(total)}</div>
+          <div className="text-sm text-ink-500 dark:text-obsidian-400">{cart.length} productos · {money(total)}</div>
           <div className="flex gap-2">
             <button onClick={onClose} className="btn-secondary">Cancelar</button>
             <button onClick={submit} disabled={saving} className="btn-primary">
-              {saving ? "Guardandoâ€¦" : "Crear pedido"}
+              {saving ? "Guardando…" : "Crear pedido"}
             </button>
           </div>
         </div>
@@ -390,8 +390,8 @@ function AssignModal({ order, onClose, onAssigned }) {
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
       <div className="card w-full max-w-md p-5">
-        <h2 className="text-lg font-semibold text-ink-800 dark:text-obsidian-50 mb-3">Asignar repartidor Â· #{order.id}</h2>
-        <div className="text-sm text-ink-500 dark:text-obsidian-400 mb-3">{order.customer_name} Â· {order.customer_address}</div>
+        <h2 className="text-lg font-semibold text-ink-800 dark:text-obsidian-50 mb-3">Asignar repartidor · #{order.id}</h2>
+        <div className="text-sm text-ink-500 dark:text-obsidian-400 mb-3">{order.customer_name} · {order.customer_address}</div>
         {persons.length === 0 && <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800">No hay repartidores registrados.</div>}
         <div className="space-y-2 max-h-80 overflow-y-auto">
           {persons.map((p) => (
@@ -402,7 +402,7 @@ function AssignModal({ order, onClose, onAssigned }) {
             >
               <div>
                 <div className="font-medium text-ink-800 dark:text-obsidian-50">{p.name}</div>
-                <div className="text-xs text-ink-500 dark:text-obsidian-400">{p.phone || "Sin telÃ©fono"}</div>
+                <div className="text-xs text-ink-500 dark:text-obsidian-400">{p.phone || "Sin teléfono"}</div>
               </div>
               <div className="text-right">
                 <div className="text-xs font-semibold text-ink-600 dark:text-obsidian-200">{p.active_orders} activo{p.active_orders !== 1 ? "s" : ""}</div>
@@ -445,8 +445,8 @@ function OrderDetailModal({ order, onClose, onChanged }) {
         </div>
         <div className="grid grid-cols-2 gap-3 text-sm mb-4">
           <div><span className="text-ink-400 dark:text-obsidian-500">Cliente:</span> <b>{order.customer_name}</b></div>
-          <div><span className="text-ink-400 dark:text-obsidian-500">TelÃ©fono:</span> {order.customer_phone}</div>
-          <div className="col-span-2"><span className="text-ink-400 dark:text-obsidian-500">DirecciÃ³n:</span> {order.customer_address} {order.customer_neighborhood && `Â· ${order.customer_neighborhood}`}</div>
+          <div><span className="text-ink-400 dark:text-obsidian-500">Teléfono:</span> {order.customer_phone}</div>
+          <div className="col-span-2"><span className="text-ink-400 dark:text-obsidian-500">Dirección:</span> {order.customer_address} {order.customer_neighborhood && `· ${order.customer_neighborhood}`}</div>
           {order.customer_reference && <div className="col-span-2"><span className="text-ink-400 dark:text-obsidian-500">Referencia:</span> {order.customer_reference}</div>}
           {order.delivery_name && <div><span className="text-ink-400 dark:text-obsidian-500">Repartidor:</span> <b>{order.delivery_name}</b></div>}
           <div><span className="text-ink-400 dark:text-obsidian-500">Estado:</span> <span className={`badge ${statusColors[order.status]}`}>{statusLabels[order.status]}</span></div>
@@ -456,12 +456,12 @@ function OrderDetailModal({ order, onClose, onChanged }) {
             <StickyNote size={14} className="inline mr-1" /> {order.notes}
           </div>
         )}
-        {loading ? <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargandoâ€¦</div> : (
+        {loading ? <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargando…</div> : (
           <div className="space-y-1.5">
             {items.map((it) => (
               <div key={it.id} className="flex items-center justify-between text-sm py-1.5 border-b border-paper-200 dark:border-obsidian-800">
                 <div>
-                  <div className="font-medium text-ink-800 dark:text-obsidian-50">{it.name_snapshot} {it.notes && <span className="text-xs text-amber-700 dark:text-amber-400">Â· {it.notes}</span>}</div>
+                  <div className="font-medium text-ink-800 dark:text-obsidian-50">{it.name_snapshot} {it.notes && <span className="text-xs text-amber-700 dark:text-amber-400">· {it.notes}</span>}</div>
                   <div className="text-xs text-ink-500 dark:text-obsidian-400">{money(it.unit_price)} c/u</div>
                 </div>
                 <div className="font-semibold text-ink-700 dark:text-obsidian-100">x{it.quantity}</div>
@@ -534,7 +534,7 @@ function HistoryModal({ onClose }) {
             ))}
           </div>
           {!selected && <div className="text-sm text-ink-400 dark:text-obsidian-500 text-center py-8">Selecciona un repartidor para ver su historial</div>}
-          {loading && <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargandoâ€¦</div>}
+          {loading && <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargando…</div>}
           {err && <div className="text-sm text-rose-700 bg-rose-50 rounded-xl px-3 py-2 dark:bg-rose-900/30 dark:text-rose-300">{err}</div>}
           {selected && !loading && !err && history.length === 0 && (
             <div className="text-sm text-ink-400 dark:text-obsidian-500 text-center py-8">{pname} no tiene entregas registradas.</div>
@@ -544,7 +544,7 @@ function HistoryModal({ onClose }) {
               {history.map((o) => (
                 <div key={o.id} className="flex items-center justify-between card p-3 text-sm">
                   <div>
-                    <div className="font-medium text-ink-800 dark:text-obsidian-50">#{o.id} Â· {o.customer_name}</div>
+                    <div className="font-medium text-ink-800 dark:text-obsidian-50">#{o.id} · {o.customer_name}</div>
                     <div className="text-xs text-ink-500 dark:text-obsidian-400">{o.customer_address}</div>
                   </div>
                   <div className="text-right">
@@ -589,11 +589,11 @@ function ReopenModal({ order, onClose, onReopened }) {
           Reabrir pedido #{order.id}
         </h2>
         <div className="card p-3 bg-amber-50 border-amber-200 mb-3 text-sm text-amber-900 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-200">
-          <b>Esta acciÃ³n es delicada.</b> Va a:
+          <b>Esta acción es delicada.</b> Va a:
           <ul className="list-disc pl-5 mt-1 space-y-0.5">
-            <li>Deshacer el cobro ({money(order.total)} Â· {order.payment_method || "?"})</li>
-            <li>Devolver el pedido a {order.delivery_person_id ? "En camino (repartidor vuelve a estar ocupado)" : "En preparaciÃ³n"}</li>
-            <li>Si ya se contabilizÃ³ en reportes de hoy, no se actualizarÃ¡</li>
+            <li>Deshacer el cobro ({money(order.total)} · {order.payment_method || "?"})</li>
+            <li>Devolver el pedido a {order.delivery_person_id ? "En camino (repartidor vuelve a estar ocupado)" : "En preparación"}</li>
+            <li>Si ya se contabilizó en reportes de hoy, no se actualizará</li>
           </ul>
         </div>
         <label className="label">Escribe <code className="px-1.5 py-0.5 rounded bg-ink-100 dark:bg-obsidian-800 text-amber-700 dark:text-amber-300 font-mono text-xs">{required}</code> para confirmar:</label>
@@ -608,7 +608,7 @@ function ReopenModal({ order, onClose, onReopened }) {
         <div className="mt-4 flex gap-2">
           <button onClick={onClose} className="btn-secondary flex-1">Cancelar</button>
           <button onClick={submit} disabled={busy} className="btn-primary flex-1">
-            {busy ? "Reabriendoâ€¦" : "Reabrir pedido"}
+            {busy ? "Reabriendo…" : "Reabrir pedido"}
           </button>
         </div>
       </div>
@@ -668,7 +668,7 @@ export default function Delivery() {
   };
 
   if (user?.role !== "admin") {
-    return <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Esta secciÃ³n es solo para el cajero/administrador.</div>;
+    return <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Esta sección es solo para el cajero/administrador.</div>;
   }
 
   return (
@@ -704,13 +704,13 @@ export default function Delivery() {
             onClick={() => setFilter("delivered")}
             className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:underline"
           >
-            Ver todos ({totalDeliveredCount}) â†’
+            Ver todos ({totalDeliveredCount}) →
           </button>
         </div>
       )}
 
       {loading ? (
-        <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargandoâ€¦</div>
+        <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargando…</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           {COLUMNS.map((col) => (
@@ -753,7 +753,7 @@ export default function Delivery() {
           <div className="card w-full max-w-md p-5">
             <h2 className="text-lg font-semibold text-ink-800 dark:text-obsidian-50 mb-3">Cancelar pedido #{toCancel.id}</h2>
             <label className="label">Motivo</label>
-            <input className="input" value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} placeholder="Cliente no contesta, direcciÃ³n errÃ³neaâ€¦" />
+            <input className="input" value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} placeholder="Cliente no contesta, dirección errónea…" />
             <div className="mt-4 flex justify-end gap-2">
               <button onClick={() => { setToCancel(null); setCancelReason(""); }} className="btn-secondary">Volver</button>
               <button onClick={cancel} className="btn-danger">Cancelar pedido</button>

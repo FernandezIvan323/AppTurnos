@@ -33,7 +33,7 @@ const items = [
 
 const labelFor = (it, role) => {
   if (it.label) return it.label;
-  if (it.labelKey === "catalog") return role === "admin" ? "MenÃº" : "CatÃ¡logo";
+  if (it.labelKey === "catalog") return role === "admin" ? "Menú" : "Catálogo";
   return "";
 };
 
@@ -52,7 +52,7 @@ export default function Sidebar() {
           </div>
           <div>
             <div className="text-lg font-semibold text-ink-800 dark:text-obsidian-50 leading-tight">AppTurnos</div>
-            <div className="text-xs text-ink-500 dark:text-obsidian-400">GestiÃ³n del restaurant</div>
+            <div className="text-xs text-ink-500 dark:text-obsidian-400">Gestión del restaurant</div>
           </div>
         </div>
       </div>
@@ -84,7 +84,7 @@ export default function Sidebar() {
 
       <div className="p-3 border-t border-paper-300 dark:border-obsidian-800">
         <div className="px-3 py-2 text-xs text-ink-500 dark:text-obsidian-400">
-          SesiÃ³n iniciada como
+          Sesión iniciada como
           <div className="text-sm font-semibold text-ink-800 dark:text-obsidian-50">{user.name}</div>
           <div className="text-xs text-ink-500 dark:text-obsidian-400 capitalize">
             {user.role === "admin" ? "Cajero / Administrador" : "Mesero"}
@@ -101,7 +101,7 @@ export default function Sidebar() {
           onClick={() => setShowLogout(true)}
           className="btn-ghost w-full justify-start mt-1"
         >
-          <LogOut size={16} /> Cerrar sesiÃ³n
+          <LogOut size={16} /> Cerrar sesión
         </button>
       </div>
       {showLogout && (

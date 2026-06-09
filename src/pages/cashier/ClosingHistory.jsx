@@ -31,7 +31,7 @@ export default function ClosingHistory() {
   return (
     <div>
       <Header
-        title="HistÃ³rico de cortes"
+        title="Histórico de cortes"
         subtitle="Listado de cierres Z realizados"
         right={
           <Link to="/cashier/closing" className="btn-secondary text-sm">
@@ -61,11 +61,11 @@ export default function ClosingHistory() {
       </div>
 
       {loading ? (
-        <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Cargandoâ€¦</div>
+        <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Cargando…</div>
       ) : closings.length === 0 ? (
         <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">
           <History size={32} className="mx-auto text-ink-300 dark:text-obsidian-300 mb-2"/>
-          No hay cortes registrados todavÃ­a.
+          No hay cortes registrados todavía.
         </div>
       ) : (
         <div className="card overflow-hidden">
@@ -108,7 +108,7 @@ export default function ClosingHistory() {
                       <td className={`px-4 py-3 text-right font-semibold ${diffClass}`}>
                         {d > 0 ? "+" : ""}{money(d)}
                       </td>
-                      <td className="px-4 py-3 text-ink-600 dark:text-obsidian-200">{c.closed_by_name || "â€”"}</td>
+                      <td className="px-4 py-3 text-ink-600 dark:text-obsidian-200">{c.closed_by_name || "—"}</td>
                       <td className="px-4 py-3 text-right">
                         <Receipt size={14} className="text-ink-400"/>
                       </td>
@@ -135,8 +135,8 @@ export default function ClosingHistory() {
 
             <div className="hidden print:block mb-3">
               <h1 className="text-xl font-bold">Corte de caja</h1>
-              <div className="text-sm">AppTurnos Â· {dateOnly(selected.closing_date)}</div>
-              <div className="text-sm">Cajero: {selected.closed_by_name || "â€”"}</div>
+              <div className="text-sm">AppTurnos · {dateOnly(selected.closing_date)}</div>
+              <div className="text-sm">Cajero: {selected.closed_by_name || "—"}</div>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-sm mb-3">
@@ -155,7 +155,7 @@ export default function ClosingHistory() {
                 <div className="text-xs text-ink-500 dark:text-obsidian-400">Diferencia</div>
                 <div className="font-bold">{Number(selected.difference) > 0 ? "+" : ""}{money(selected.difference)}</div>
                 <div className="text-xs text-ink-500 dark:text-obsidian-400">
-                  Esp. {money(selected.expected_cash)} Â· Con. {money(selected.counted_cash)}
+                  Esp. {money(selected.expected_cash)} · Con. {money(selected.counted_cash)}
                 </div>
               </div>
             </div>

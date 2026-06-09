@@ -44,7 +44,7 @@ function PendingBanner({ orders }) {
         Hay {orders.length} pedido{orders.length === 1 ? "" : "s"} pendiente{orders.length === 1 ? "" : "s"} de cobro
       </div>
       <p className="text-xs text-amber-700 dark:text-amber-300 mb-3">
-        Para hacer el corte de caja primero tenÃ©s que cobrar o cancelar todos los pedidos abiertos.
+        Para hacer el corte de caja primero tenés que cobrar o cancelar todos los pedidos abiertos.
       </p>
       <div className="max-h-40 overflow-y-auto space-y-1">
         {orders.map((o) => (
@@ -53,7 +53,7 @@ function PendingBanner({ orders }) {
               <span className="font-mono text-ink-500">#{o.id}</span>
               <span className="badge bg-ink-100 text-ink-700 dark:bg-obsidian-800 dark:text-obsidian-200">{typeLabels[o.type] || o.type}</span>
               <span className="text-ink-700 dark:text-obsidian-100">
-                {o.type === "table" ? `Mesa ${o.table_number || "?"}` : (o.customer_name || "â€”")}
+                {o.type === "table" ? `Mesa ${o.table_number || "?"}` : (o.customer_name || "—")}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -90,10 +90,10 @@ function ClosingDetail({ closing, date, onReset }) {
       <div className="card p-5">
         <div className="flex items-start justify-between gap-3 mb-4 print:hidden">
           <div>
-            <div className="text-xs text-ink-500 dark:text-obsidian-400">Corte del dÃ­a</div>
+            <div className="text-xs text-ink-500 dark:text-obsidian-400">Corte del día</div>
             <h2 className="text-2xl font-bold text-ink-800 dark:text-obsidian-50">{date}</h2>
             <div className="text-xs text-ink-500 dark:text-obsidian-400 mt-0.5">
-              Cerrado por <span className="font-medium text-ink-700 dark:text-obsidian-100">{closing.closed_by_name || "â€”"}</span> Â· {new Date(closing.closed_at).toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" })}
+              Cerrado por <span className="font-medium text-ink-700 dark:text-obsidian-100">{closing.closed_by_name || "—"}</span> · {new Date(closing.closed_at).toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" })}
             </div>
           </div>
           <div className="flex gap-2">
@@ -101,18 +101,18 @@ function ClosingDetail({ closing, date, onReset }) {
               <Printer size={14}/> Imprimir
             </button>
             {onReset && (
-              <button onClick={onReset} className="btn-ghost text-sm" title="Cerrar otro dÃ­a">
-                <XCircle size={14}/> Otro dÃ­a
+              <button onClick={onReset} className="btn-ghost text-sm" title="Cerrar otro día">
+                <XCircle size={14}/> Otro día
               </button>
             )}
           </div>
         </div>
 
-        {/* Encabezado solo para impresiÃ³n */}
+        {/* Encabezado solo para impresión */}
         <div className="hidden print:block mb-4">
           <h1 className="text-xl font-bold">Corte de caja</h1>
-          <div className="text-sm">AppTurnos Â· {date}</div>
-          <div className="text-sm">Cajero: {closing.closed_by_name || "â€”"}</div>
+          <div className="text-sm">AppTurnos · {date}</div>
+          <div className="text-sm">Cajero: {closing.closed_by_name || "—"}</div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
@@ -124,13 +124,13 @@ function ClosingDetail({ closing, date, onReset }) {
           <div className={`rounded-xl p-4 ${Math.abs(diff) < 0.01 ? "bg-emerald-50 dark:bg-emerald-900/20" : diff > 0 ? "bg-blue-50 dark:bg-blue-900/20" : "bg-rose-50 dark:bg-rose-900/20"}`}>
             <div className="text-xs text-ink-500 dark:text-obsidian-400">Diferencia de caja</div>
             <div className={`text-2xl font-bold ${diffColor}`}>{diffLabel}</div>
-            <div className="text-xs text-ink-500 dark:text-obsidian-400">Esperado {money(closing.expected_cash)} Â· Contado {money(closing.counted_cash)}</div>
+            <div className="text-xs text-ink-500 dark:text-obsidian-400">Esperado {money(closing.expected_cash)} · Contado {money(closing.counted_cash)}</div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <h3 className="text-sm font-semibold text-ink-700 dark:text-obsidian-100 mb-2">Desglose por mÃ©todo de pago</h3>
+            <h3 className="text-sm font-semibold text-ink-700 dark:text-obsidian-100 mb-2">Desglose por método de pago</h3>
             <div className="card p-3">
               <MethodRow icon={Banknote}  label="Efectivo"      value={closing.cash_sales} />
               <MethodRow icon={CreditCard} label="Tarjeta"       value={closing.card_sales} />
@@ -158,7 +158,7 @@ function ClosingDetail({ closing, date, onReset }) {
                 <span className="font-bold">{money(closing.expected_cash)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-ink-600 dark:text-obsidian-200">Contado fÃ­sicamente</span>
+                <span className="text-ink-600 dark:text-obsidian-200">Contado físicamente</span>
                 <span className="font-semibold">{money(closing.counted_cash)}</span>
               </div>
               <div className={`flex items-center justify-between text-sm border-t border-paper-300 dark:border-obsidian-700 pt-2 ${diffColor}`}>
@@ -176,9 +176,9 @@ function ClosingDetail({ closing, date, onReset }) {
           </div>
         )}
 
-        {/* Pie solo para impresiÃ³n */}
+        {/* Pie solo para impresión */}
         <div className="hidden print:block mt-6 pt-4 border-t border-ink-200 text-xs text-ink-500">
-          Generado el {new Date().toLocaleString("es-MX")} Â· AppTurnos
+          Generado el {new Date().toLocaleString("es-MX")} · AppTurnos
         </div>
       </div>
     </div>
@@ -213,7 +213,7 @@ function ClosingForm({ preview, date, onSuccess }) {
   return (
     <div className="card p-5 space-y-4" id="closing-form">
       <div className="bg-paper-100 dark:bg-obsidian-950 rounded-xl p-4">
-        <div className="text-xs text-ink-500 dark:text-obsidian-400 mb-2">Resumen del dÃ­a {date}</div>
+        <div className="text-xs text-ink-500 dark:text-obsidian-400 mb-2">Resumen del día {date}</div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
           <div>
             <div className="text-ink-500 dark:text-obsidian-400 text-xs">Ventas</div>
@@ -248,7 +248,7 @@ function ClosingForm({ preview, date, onSuccess }) {
                 <div className="font-bold text-rose-700 dark:text-rose-400">âˆ’{money(preview.expense_summary.total_expenses)}</div>
               </div>
               <div>
-                <div className="text-ink-500 dark:text-obsidian-400 text-xs">Neto del dÃ­a</div>
+                <div className="text-ink-500 dark:text-obsidian-400 text-xs">Neto del día</div>
                 <div className={`font-bold ${preview.expense_summary.net >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400"}`}>
                   {money(preview.expense_summary.net)}
                 </div>
@@ -323,7 +323,7 @@ function ClosingForm({ preview, date, onSuccess }) {
         <label className="label">Observaciones (opcional)</label>
         <textarea
           className="input min-h-[70px] resize-y"
-          placeholder="Ej: Faltante por error en cambio. Sobrante por propina no registradaâ€¦"
+          placeholder="Ej: Faltante por error en cambio. Sobrante por propina no registrada…"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
         />
@@ -338,13 +338,13 @@ function ClosingForm({ preview, date, onSuccess }) {
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
         <AlertTriangle size={16} className="shrink-0 mt-0.5"/>
         <div>
-          Una vez confirmado, el corte <strong>no se puede modificar ni eliminar</strong>. QuedarÃ¡ como registro histÃ³rico.
+          Una vez confirmado, el corte <strong>no se puede modificar ni eliminar</strong>. Quedará como registro histórico.
         </div>
       </div>
 
       <button onClick={submit} disabled={busy} className="btn-primary w-full text-base py-3">
         <CheckCircle2 size={18}/>
-        {busy ? "Cerrando cajaâ€¦" : "Confirmar corte de caja"}
+        {busy ? "Cerrando caja…" : "Confirmar corte de caja"}
       </button>
     </div>
   );
@@ -388,7 +388,7 @@ export default function CashClosing() {
     <div>
       <Header
         title="Corte de caja"
-        subtitle="Cierre Z Â· Arqueo diario"
+        subtitle="Cierre Z · Arqueo diario"
         right={
           <div className="flex gap-2 items-center">
             <input
@@ -399,7 +399,7 @@ export default function CashClosing() {
               className="input py-1.5 text-sm"
             />
             <Link to="/cashier/closing/history" className="btn-secondary text-sm">
-              <History size={14}/> HistÃ³rico
+              <History size={14}/> Histórico
             </Link>
           </div>
         }
@@ -409,12 +409,12 @@ export default function CashClosing() {
         {!isToday && !alreadyClosed && (
           <div className="card p-3 bg-blue-50/60 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-sm text-blue-800 dark:text-blue-300 flex items-center gap-2">
             <AlertTriangle size={16}/>
-            EstÃ¡s cerrando un dÃ­a anterior ({date}). Asegurate de que sea correcto.
+            Estás cerrando un día anterior ({date}). Asegurate de que sea correcto.
           </div>
         )}
 
         {loading ? (
-          <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Cargandoâ€¦</div>
+          <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Cargando…</div>
         ) : err ? (
           <div className="card p-4 text-sm text-rose-700 dark:text-rose-300">{err}</div>
         ) : !preview ? null : alreadyClosed ? (
@@ -426,14 +426,14 @@ export default function CashClosing() {
             <PendingBanner orders={preview.pending_orders} />
             <div className="card p-4 text-sm text-ink-500 dark:text-obsidian-400">
               <Calculator size={18} className="inline mr-1.5"/>
-              Una vez que cobres o canceles los pedidos pendientes, volvÃ© a esta pantalla para hacer el corte.
+              Una vez que cobres o canceles los pedidos pendientes, volvé a esta pantalla para hacer el corte.
             </div>
           </>
         ) : (
           <>
             <div className="card p-3 text-sm text-emerald-700 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 flex items-center gap-2">
               <CheckCircle2 size={16}/>
-              No hay pedidos pendientes. PodÃ©s hacer el corte de caja del {date}.
+              No hay pedidos pendientes. Podés hacer el corte de caja del {date}.
             </div>
             <ClosingForm preview={preview} date={date} onSuccess={() => load(date)} />
           </>

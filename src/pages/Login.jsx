@@ -63,7 +63,7 @@ export default function Login() {
           </div>
 
           <div>
-            <label className="label text-center">PIN de {PIN_LENGTH} dÃ­gitos</label>
+            <label className="label text-center">PIN de {PIN_LENGTH} dígitos</label>
             <div className="flex justify-center gap-3 my-3">
               {Array.from({ length: PIN_LENGTH }).map((_, i) => (
                 <div
@@ -74,7 +74,7 @@ export default function Login() {
                       : "border-paper-300 bg-paper-50 text-ink-300 dark:bg-obsidian-950 dark:border-obsidian-700/80 dark:text-obsidian-500"
                   }`}
                 >
-                  {pin[i] ? "â€¢" : ""}
+                  {pin[i] ? "•" : ""}
                 </div>
               ))}
             </div>
@@ -129,12 +129,12 @@ export default function Login() {
             disabled={loading || pin.length !== PIN_LENGTH}
             className="btn-primary w-full h-12 text-base"
           >
-            {loading ? "Verificandoâ€¦" : "Entrar"}
+            {loading ? "Verificando…" : "Entrar"}
           </button>
 
           <div className="text-xs text-ink-500 dark:text-obsidian-400 text-center pt-3 border-t border-paper-200 dark:border-obsidian-700/50">
             <div className="font-medium text-ink-600 dark:text-obsidian-200 mb-0.5">Cuentas de prueba</div>
-            <div>admin / 1234 Â· ivan / 0000 Â· maria / 0000</div>
+            <div>admin / 1234 · ivan / 0000 · maria / 0000</div>
           </div>
         </form>
       </div>

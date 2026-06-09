@@ -18,12 +18,12 @@ function MovementModal({ product, onClose }) {
       <div className="card w-full max-w-xl max-h-[90vh] flex flex-col">
         <div className="px-5 py-4 border-b border-paper-300 dark:border-obsidian-800 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-ink-800 dark:text-obsidian-50 flex items-center gap-2">
-            <History size={18}/> Movimientos Â· {product.name}
+            <History size={18}/> Movimientos · {product.name}
           </h2>
           <button onClick={onClose} className="btn-ghost"><X size={18}/></button>
         </div>
         <div className="p-5 overflow-y-auto flex-1 space-y-2">
-          {loading && <div className="text-sm text-ink-500">Cargandoâ€¦</div>}
+          {loading && <div className="text-sm text-ink-500">Cargando…</div>}
           {!loading && movements.length === 0 && <div className="text-sm text-ink-400">Sin movimientos registrados.</div>}
           {movements.map((m) => (
             <div key={m.id} className="flex items-center justify-between card p-3 text-sm">
@@ -97,7 +97,7 @@ function StockModal({ product, onClose, onSaved }) {
           <>
             <label className="label">Stock actual</label>
             <input className="input" type="number" step="0.01" value={stock} onChange={(e) => setStock(e.target.value)} />
-            <label className="label mt-3">Stock mÃ­nimo</label>
+            <label className="label mt-3">Stock mínimo</label>
             <input className="input" type="number" step="0.01" value={min_stock} onChange={(e) => setMinStock(e.target.value)} />
           </>
         ) : (
@@ -105,13 +105,13 @@ function StockModal({ product, onClose, onSaved }) {
             <label className="label">Cantidad</label>
             <input className="input" type="number" step="0.01" value={quantity} onChange={(e) => setQuantity(e.target.value)} autoFocus />
             <label className="label mt-3">Motivo (opcional)</label>
-            <input className="input" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Compra, merma, ajusteâ€¦" />
+            <input className="input" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Compra, merma, ajuste…" />
           </>
         )}
         {err && <div className="mt-3 text-sm text-rose-700 bg-rose-50 rounded-xl px-3 py-2 dark:bg-rose-900/30 dark:text-rose-300">{err}</div>}
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="btn-secondary">Cancelar</button>
-          <button onClick={submit} disabled={saving} className="btn-primary">{saving ? "Guardandoâ€¦" : "Guardar"}</button>
+          <button onClick={submit} disabled={saving} className="btn-primary">{saving ? "Guardando…" : "Guardar"}</button>
         </div>
       </div>
     </div>
@@ -143,7 +143,7 @@ export default function Inventory() {
   const lowStock = useMemo(() => products.filter((p) => p.low_stock), [products]);
 
   if (user?.role !== "admin") {
-    return <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Esta secciÃ³n es solo para el administrador.</div>;
+    return <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Esta sección es solo para el administrador.</div>;
   }
 
   return (
@@ -171,19 +171,19 @@ export default function Inventory() {
       <div className="mb-4 flex items-center gap-2">
         <div className="relative flex-1 max-w-xs">
           <Search size={14} className="absolute left-3 top-2.5 text-ink-400"/>
-          <input className="input pl-8 text-sm" placeholder="Buscar productoâ€¦" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input className="input pl-8 text-sm" placeholder="Buscar producto…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
       {loading ? (
-        <div className="text-sm text-ink-500">Cargandoâ€¦</div>
+        <div className="text-sm text-ink-500">Cargando…</div>
       ) : (
         <div className="card overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-paper-200 dark:bg-obsidian-800 text-ink-600 dark:text-obsidian-200 text-left">
               <tr>
                 <th className="px-4 py-2 font-medium">Producto</th>
-                <th className="px-4 py-2 font-medium">CategorÃ­a</th>
+                <th className="px-4 py-2 font-medium">Categoría</th>
                 <th className="px-4 py-2 font-medium text-right">Stock</th>
                 <th className="px-4 py-2 font-medium text-right">Min.</th>
                 <th className="px-4 py-2 font-medium text-right w-32">Acciones</th>
@@ -193,7 +193,7 @@ export default function Inventory() {
               {filtered.map((p) => (
                 <tr key={p.id} className={`border-t border-paper-200 dark:border-obsidian-800 ${p.low_stock ? "bg-rose-50/50 dark:bg-rose-900/10" : ""}`}>
                   <td className="px-4 py-2 font-medium text-ink-800 dark:text-obsidian-50">{p.name}</td>
-                  <td className="px-4 py-2 text-ink-500 dark:text-obsidian-400">{p.category_name || "â€”"}</td>
+                  <td className="px-4 py-2 text-ink-500 dark:text-obsidian-400">{p.category_name || "—"}</td>
                   <td className={`px-4 py-2 text-right font-semibold ${p.low_stock ? "text-rose-700 dark:text-rose-300" : "text-ink-700 dark:text-obsidian-100"}`}>
                     {p.stock}
                   </td>

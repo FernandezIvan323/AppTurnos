@@ -16,7 +16,7 @@ function RangePicker({ value, onChange }) {
         { v: "today",     l: "Hoy" },
         { v: "week",      l: "Semana" },
         { v: "month",     l: "Mes" },
-        { v: "year",      l: "AÃ±o" },
+        { v: "year",      l: "Año" },
         { v: "custom",    l: "Personalizado" },
       ].map((t) => (
         <button
@@ -42,15 +42,15 @@ function getRange(preset) {
   }
   if (preset === "week") {
     start.setDate(today.getDate() - 6);
-    return { from: ymd(start), to: ymd(today), label: "Ãšltimos 7 dÃ­as" };
+    return { from: ymd(start), to: ymd(today), label: "Ãšltimos 7 días" };
   }
   if (preset === "month") {
     start.setDate(today.getDate() - 29);
-    return { from: ymd(start), to: ymd(today), label: "Ãšltimos 30 dÃ­as" };
+    return { from: ymd(start), to: ymd(today), label: "Ãšltimos 30 días" };
   }
   if (preset === "year") {
     start.setDate(today.getDate() - 364);
-    return { from: ymd(start), to: ymd(today), label: "Ãšltimos 365 dÃ­as" };
+    return { from: ymd(start), to: ymd(today), label: "Ãšltimos 365 días" };
   }
   return { from: ymd(today), to: ymd(today), label: "Personalizado" };
 }
@@ -79,7 +79,7 @@ function TrendPill({ current, previous, format = (n) => n }) {
   const Icon = up ? TrendingUp : TrendingDown;
   return (
     <span className={`inline-flex items-center gap-1 text-xs font-medium ${up ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-      <Icon size={12} /> {Math.abs(diff).toFixed(1)}% vs perÃ­odo anterior
+      <Icon size={12} /> {Math.abs(diff).toFixed(1)}% vs período anterior
     </span>
   );
 }
@@ -92,7 +92,7 @@ export default function Reports() {
 
   const range = useMemo(() => {
     if (preset === "custom" && customFrom && customTo) {
-      return { from: customFrom, to: customTo, label: `${customFrom} â†’ ${customTo}` };
+      return { from: customFrom, to: customTo, label: `${customFrom} → ${customTo}` };
     }
     return getRange(preset);
   }, [preset, customFrom, customTo]);
@@ -155,21 +155,21 @@ export default function Reports() {
         <div className="card p-4 mb-4 flex items-center gap-3">
           <Calendar size={16} className="text-ink-500"/>
           <input type="date" className="input h-9 text-sm max-w-[160px]" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} />
-          <span className="text-ink-400">â†’</span>
+          <span className="text-ink-400">→</span>
           <input type="date" className="input h-9 text-sm max-w-[160px]" value={customTo} onChange={(e) => setCustomTo(e.target.value)} />
         </div>
       )}
 
       {loading ? (
-        <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargandoâ€¦</div>
+        <div className="text-sm text-ink-500 dark:text-obsidian-400">Cargando…</div>
       ) : (
         <>
           {/* === SECCIÃ“N A: Resumen de ventas === */}
-          <h2 className="text-sm font-semibold text-ink-500 dark:text-obsidian-400 uppercase tracking-wide mb-3">A Â· Resumen de ventas</h2>
+          <h2 className="text-sm font-semibold text-ink-500 dark:text-obsidian-400 uppercase tracking-wide mb-3">A · Resumen de ventas</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-3">
             <StatCard
               icon={DollarSign}
-              label="Ventas del perÃ­odo"
+              label="Ventas del período"
               value={money(sales?.current?.sales || 0)}
               sub={<TrendPill current={sales?.current?.sales} previous={sales?.previous?.sales} />}
             />
@@ -177,7 +177,7 @@ export default function Reports() {
               icon={ShoppingBag}
               label="Pedidos"
               value={sales?.current?.orders || 0}
-              sub={`${sales?.current?.delivery_orders || 0} domicilios Â· ${sales?.current?.table_orders || 0} mesas`}
+              sub={`${sales?.current?.delivery_orders || 0} domicilios · ${sales?.current?.table_orders || 0} mesas`}
               color="bg-amber-50 text-amber-700" darkColor="dark:bg-amber-900/30 dark:text-amber-300"
             />
             <StatCard
@@ -196,10 +196,10 @@ export default function Reports() {
             />
           </div>
 
-          {/* GrÃ¡fico de ventas por dÃ­a */}
+          {/* Gráfico de ventas por día */}
           {sales?.days?.length > 0 && (
             <div className="card p-5 mb-6">
-              <h3 className="font-semibold text-ink-700 dark:text-obsidian-100 mb-3">Ventas por dÃ­a</h3>
+              <h3 className="font-semibold text-ink-700 dark:text-obsidian-100 mb-3">Ventas por día</h3>
               <BarChart
                 data={sales.days.map((d) => ({
                   label: new Date(d.date).toLocaleDateString("es-MX", { day: "2-digit", month: "short" }),
@@ -213,7 +213,7 @@ export default function Reports() {
           )}
 
           {/* === SECCIÃ“N B: Top productos === */}
-          <h2 className="text-sm font-semibold text-ink-500 dark:text-obsidian-400 uppercase tracking-wide mb-3">B Â· Productos mÃ¡s vendidos (Top 10)</h2>
+          <h2 className="text-sm font-semibold text-ink-500 dark:text-obsidian-400 uppercase tracking-wide mb-3">B · Productos más vendidos (Top 10)</h2>
           <div className="card p-5 mb-6">
             <div className="flex items-center gap-1 mb-3">
               {[
@@ -232,7 +232,7 @@ export default function Reports() {
               ))}
             </div>
             {topProducts.length === 0 ? (
-              <div className="text-sm text-ink-400 dark:text-obsidian-500 text-center py-6">Sin ventas en el perÃ­odo.</div>
+              <div className="text-sm text-ink-400 dark:text-obsidian-500 text-center py-6">Sin ventas en el período.</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -240,7 +240,7 @@ export default function Reports() {
                     <tr>
                       <th className="py-2 pr-3 font-medium">#</th>
                       <th className="py-2 pr-3 font-medium">Producto</th>
-                      <th className="py-2 pr-3 font-medium">CategorÃ­a</th>
+                      <th className="py-2 pr-3 font-medium">Categoría</th>
                       <th className="py-2 pr-3 font-medium text-right">Cantidad</th>
                       <th className="py-2 pr-3 font-medium text-right">Pedidos</th>
                       <th className="py-2 pl-3 font-medium text-right">Ingresos</th>
@@ -251,7 +251,7 @@ export default function Reports() {
                       <tr key={i} className="border-b border-paper-200 dark:border-obsidian-800">
                         <td className="py-2 pr-3 text-ink-400 dark:text-obsidian-500">{i + 1}</td>
                         <td className="py-2 pr-3 font-medium text-ink-800 dark:text-obsidian-50">{p.name}</td>
-                        <td className="py-2 pr-3 text-ink-500 dark:text-obsidian-400">{p.category || "â€”"}</td>
+                        <td className="py-2 pr-3 text-ink-500 dark:text-obsidian-400">{p.category || "—"}</td>
                         <td className="py-2 pr-3 text-right font-semibold">{p.qty}</td>
                         <td className="py-2 pr-3 text-right text-ink-500 dark:text-obsidian-400">{p.orders_count}</td>
                         <td className="py-2 pl-3 text-right font-semibold text-brand-700 dark:text-wine-300">{money(p.revenue)}</td>
@@ -263,15 +263,15 @@ export default function Reports() {
             )}
           </div>
 
-          {/* === SECCIÃ“N C: MÃ©tricas adicionales === */}
-          <h2 className="text-sm font-semibold text-ink-500 dark:text-obsidian-400 uppercase tracking-wide mb-3">C Â· MÃ©tricas adicionales</h2>
+          {/* === SECCIÃ“N C: Métricas adicionales === */}
+          <h2 className="text-sm font-semibold text-ink-500 dark:text-obsidian-400 uppercase tracking-wide mb-3">C · Métricas adicionales</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
             {/* Horarios pico */}
             <div className="card p-5">
               <h3 className="font-semibold text-ink-700 dark:text-obsidian-100 mb-1 flex items-center gap-2">
                 <Clock size={16}/> Horarios pico
               </h3>
-              <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-3">Cantidad de pedidos cobrados por hora del dÃ­a</p>
+              <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-3">Cantidad de pedidos cobrados por hora del día</p>
               <BarChart
                 data={peakHours.map((h) => ({
                   label: `${String(h.hour).padStart(2, "0")}:00`,
@@ -281,12 +281,12 @@ export default function Reports() {
               />
             </div>
 
-            {/* Ventas por categorÃ­a */}
+            {/* Ventas por categoría */}
             <div className="card p-5">
               <h3 className="font-semibold text-ink-700 dark:text-obsidian-100 mb-1 flex items-center gap-2">
-                <Tag size={16}/> Ventas por categorÃ­a
+                <Tag size={16}/> Ventas por categoría
               </h3>
-              <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-3">Ingresos generados por categorÃ­a</p>
+              <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-3">Ingresos generados por categoría</p>
               <BarChart
                 data={byCategory.map((c) => ({
                   label: c.category,
@@ -295,14 +295,14 @@ export default function Reports() {
               />
             </div>
 
-            {/* Clientes mÃ¡s frecuentes */}
+            {/* Clientes más frecuentes */}
             <div className="card p-5">
               <h3 className="font-semibold text-ink-700 dark:text-obsidian-100 mb-1 flex items-center gap-2">
-                <UsersIcon size={16}/> Clientes mÃ¡s frecuentes
+                <UsersIcon size={16}/> Clientes más frecuentes
               </h3>
               <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-3">Top 10 por gasto total</p>
               {topCustomers.length === 0 ? (
-                <div className="text-sm text-ink-400 dark:text-obsidian-500 text-center py-4">Sin clientes en el perÃ­odo.</div>
+                <div className="text-sm text-ink-400 dark:text-obsidian-500 text-center py-4">Sin clientes en el período.</div>
               ) : (
                 <div className="space-y-1.5">
                   {topCustomers.map((c, i) => (
@@ -312,7 +312,7 @@ export default function Reports() {
                         <div>
                           <div className="font-medium text-ink-800 dark:text-obsidian-50">{c.name}</div>
                           <div className="text-xs text-ink-500 dark:text-obsidian-400">
-                            {c.orders_count} pedidos {c.neighborhood && `Â· ${c.neighborhood}`}
+                            {c.orders_count} pedidos {c.neighborhood && `· ${c.neighborhood}`}
                           </div>
                         </div>
                       </div>
@@ -329,27 +329,27 @@ export default function Reports() {
             {sales && (
               <div className="card p-5">
                 <h3 className="font-semibold text-ink-700 dark:text-obsidian-100 mb-1 flex items-center gap-2">
-                  <TrendingUp size={16}/> Comparativa con perÃ­odo anterior
+                  <TrendingUp size={16}/> Comparativa con período anterior
                 </h3>
-                <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-3">Mismo nÃºmero de dÃ­as anteriores</p>
+                <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-3">Mismo número de días anteriores</p>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-ink-500 dark:text-obsidian-400">Ventas perÃ­odo actual</span>
+                    <span className="text-sm text-ink-500 dark:text-obsidian-400">Ventas período actual</span>
                     <span className="text-lg font-bold text-ink-800 dark:text-obsidian-50">{money(sales.current.sales)}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-ink-500 dark:text-obsidian-400">Ventas perÃ­odo anterior</span>
+                    <span className="text-sm text-ink-500 dark:text-obsidian-400">Ventas período anterior</span>
                     <span className="text-lg font-bold text-ink-500 dark:text-obsidian-400">{money(sales.previous?.sales || 0)}</span>
                   </div>
                   <div className="pt-3 border-t border-paper-200 dark:border-obsidian-800">
                     <TrendPill current={sales.current.sales} previous={sales.previous?.sales} format={(n) => money(n)} />
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-ink-500 dark:text-obsidian-400">Pedidos perÃ­odo actual</span>
+                    <span className="text-ink-500 dark:text-obsidian-400">Pedidos período actual</span>
                     <span className="font-semibold">{sales.current.orders}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-ink-500 dark:text-obsidian-400">Pedidos perÃ­odo anterior</span>
+                    <span className="text-ink-500 dark:text-obsidian-400">Pedidos período anterior</span>
                     <span className="font-semibold text-ink-500 dark:text-obsidian-400">{sales.previous?.orders || 0}</span>
                   </div>
                 </div>
@@ -361,16 +361,16 @@ export default function Reports() {
               <h3 className="font-semibold text-ink-700 dark:text-obsidian-100 mb-1 flex items-center gap-2">
                 <AlertCircle size={16}/> Productos nunca vendidos
               </h3>
-              <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-3">Candidatos a retirar o replantear del menÃº</p>
+              <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-3">Candidatos a retirar o replantear del menú</p>
               {neverSold.length === 0 ? (
-                <div className="text-sm text-emerald-700 dark:text-emerald-300 text-center py-4">Â¡Todo el catÃ¡logo se ha vendido al menos una vez!</div>
+                <div className="text-sm text-emerald-700 dark:text-emerald-300 text-center py-4">¡Todo el catálogo se ha vendido al menos una vez!</div>
               ) : (
                 <div className="space-y-1.5 max-h-72 overflow-y-auto">
                   {neverSold.map((p) => (
                     <div key={p.id} className="flex items-center justify-between text-sm py-1.5 border-b border-paper-200 dark:border-obsidian-800 last:border-0">
                       <div>
                         <div className="font-medium text-ink-800 dark:text-obsidian-50">{p.name}</div>
-                        <div className="text-xs text-ink-500 dark:text-obsidian-400">{p.category || "Sin categorÃ­a"}</div>
+                        <div className="text-xs text-ink-500 dark:text-obsidian-400">{p.category || "Sin categoría"}</div>
                       </div>
                       <span className="text-xs text-ink-500 dark:text-obsidian-400">{money(p.price)}</span>
                     </div>

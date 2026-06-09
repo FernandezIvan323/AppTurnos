@@ -1,6 +1,6 @@
 ﻿export default function BarChart({ data, valueKey = "value", labelKey = "label", maxBars = 20, height = 180 }) {
   if (!data || data.length === 0) {
-    return <div className="text-sm text-ink-400 dark:text-obsidian-500 text-center py-6">Sin datos en el perÃ­odo.</div>;
+    return <div className="text-sm text-ink-400 dark:text-obsidian-500 text-center py-6">Sin datos en el período.</div>;
   }
   const sliced = data.slice(0, maxBars);
   const max = Math.max(1, ...sliced.map((d) => Number(d[valueKey]) || 0));

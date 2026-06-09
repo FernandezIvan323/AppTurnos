@@ -57,7 +57,7 @@ function ExpenseModal({ open, onClose, onSaved, expense, categories }) {
       return;
     }
     if (!categoryId) {
-      setErr("SeleccionÃ¡ una categorÃ­a");
+      setErr("Seleccioná una categoría");
       return;
     }
     setBusy(true);
@@ -96,7 +96,7 @@ function ExpenseModal({ open, onClose, onSaved, expense, categories }) {
             <input type="date" className="input" value={expenseDate} onChange={(e) => setExpenseDate(e.target.value)} max={todayISO()} />
           </div>
           <div>
-            <label className="label">CategorÃ­a</label>
+            <label className="label">Categoría</label>
             <select className="input" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -120,7 +120,7 @@ function ExpenseModal({ open, onClose, onSaved, expense, categories }) {
             </div>
           </div>
           <div>
-            <label className="label">DescripciÃ³n (opcional)</label>
+            <label className="label">Descripción (opcional)</label>
             <textarea
               className="input min-h-[60px] resize-y"
               value={description}
@@ -129,7 +129,7 @@ function ExpenseModal({ open, onClose, onSaved, expense, categories }) {
             />
           </div>
           <div>
-            <label className="label">MÃ©todo de pago (opcional)</label>
+            <label className="label">Método de pago (opcional)</label>
             <div className="grid grid-cols-3 gap-2">
               {Object.entries(METHOD_LABELS).map(([k, m]) => (
                 <button
@@ -155,7 +155,7 @@ function ExpenseModal({ open, onClose, onSaved, expense, categories }) {
           <div className="flex gap-2 pt-2">
             <button onClick={onClose} className="btn-secondary flex-1">Cancelar</button>
             <button onClick={submit} disabled={busy} className="btn-primary flex-1">
-              {busy ? "Guardandoâ€¦" : (isEdit ? "Guardar cambios" : "Registrar gasto")}
+              {busy ? "Guardando…" : (isEdit ? "Guardar cambios" : "Registrar gasto")}
             </button>
           </div>
         </div>
@@ -173,11 +173,11 @@ function ConfirmDelete({ expense, onCancel, onConfirm }) {
           <Trash2 size={20} className="text-rose-600"/> Eliminar gasto
         </h2>
         <p className="text-sm text-ink-600 dark:text-obsidian-200 mb-1">
-          Â¿Eliminar el gasto de <span className="font-semibold text-ink-800 dark:text-obsidian-50">{money(expense.amount)}</span>?
+          ¿Eliminar el gasto de <span className="font-semibold text-ink-800 dark:text-obsidian-50">{money(expense.amount)}</span>?
         </p>
         <p className="text-xs text-ink-500 dark:text-obsidian-400 mb-4">
-          {expense.category_name} Â· {dateOnly(expense.expense_date)}
-          {expense.description && ` Â· ${expense.description}`}
+          {expense.category_name} · {dateOnly(expense.expense_date)}
+          {expense.description && ` · ${expense.description}`}
         </p>
         <div className="flex gap-2">
           <button onClick={onCancel} className="btn-secondary flex-1">Cancelar</button>
@@ -216,14 +216,24 @@ export default function Expenses() {
       if (to)   q.to = to;
       if (filterCat)    q.category_id = filterCat;
       if (filterMethod) q.payment_method = filterMethod;
-      const [r, c, s] = await Promise.all([
-        api.get("/expenses", { params: q }),
-        api.get("/expenses/categories"),
-        api.get("/expenses/summary", { params: { date: initialDate } }),
-      ]);
-      setExpenses(r.data);
-      setCategories(c.data);
-      setSummary(s.data);
+      try {
+        const r = await api.get("/expenses", { params: q });
+        setExpenses(r.data);
+      } catch (e) {
+        console.error("[expenses] Error al cargar gastos:", e);
+      }
+      try {
+        const c = await api.get("/expenses/categories");
+        setCategories(c.data);
+      } catch (e) {
+        console.error("[expenses] Error al cargar categorías:", e);
+      }
+      try {
+        const s = await api.get("/expenses/summary", { params: { date: initialDate } });
+        setSummary(s.data);
+      } catch (e) {
+        console.error("[expenses] Error al cargar resumen:", e);
+      }
     } finally { setLoading(false); }
   };
 
@@ -263,7 +273,7 @@ export default function Expenses() {
   };
 
   const renderMethod = (m) => {
-    if (!m) return <span className="text-xs text-ink-400">â€”</span>;
+    if (!m) return <span className="text-xs text-ink-400">—</span>;
     const def = METHOD_LABELS[m];
     const Icon = def.icon;
     return (
@@ -276,8 +286,8 @@ export default function Expenses() {
   return (
     <div>
       <Header
-        title="Gastos del dÃ­a"
-        subtitle="Compras, servicios, sueldos y mÃ¡s"
+        title="Gastos del día"
+        subtitle="Compras, servicios, sueldos y más"
         right={
           <button onClick={() => { setEditTarget(null); setModalOpen(true); }} className="btn-primary text-sm">
             <Plus size={14}/> Nuevo gasto
@@ -299,14 +309,14 @@ export default function Expenses() {
           <input type="date" className="input py-1.5 text-sm" value={to} onChange={(e) => setTo(e.target.value)} />
         </div>
         <div>
-          <label className="label text-xs">CategorÃ­a</label>
+          <label className="label text-xs">Categoría</label>
           <select className="input py-1.5 text-sm" value={filterCat} onChange={(e) => setFilterCat(e.target.value)}>
             <option value="">Todas</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
         <div>
-          <label className="label text-xs">MÃ©todo</label>
+          <label className="label text-xs">Método</label>
           <select className="input py-1.5 text-sm" value={filterMethod} onChange={(e) => setFilterMethod(e.target.value)}>
             <option value="">Todos</option>
             <option value="cash">Efectivo</option>
@@ -324,27 +334,27 @@ export default function Expenses() {
         )}
       </div>
 
-      {/* Resumen del dÃ­a + lista */}
+      {/* Resumen del día + lista */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
         <div className="card p-4">
-          <div className="text-xs text-ink-500 dark:text-obsidian-400 mb-1">Total del dÃ­a {dateOnly(initialDate)}</div>
+          <div className="text-xs text-ink-500 dark:text-obsidian-400 mb-1">Total del día {dateOnly(initialDate)}</div>
           <div className="text-2xl font-bold text-rose-700 dark:text-rose-400">{money(summary?.total_expenses || 0)}</div>
           <div className="text-[11px] text-ink-400 dark:text-obsidian-500 mt-1">
             {summary?.expense_count || 0} gasto(s) registrado(s)
           </div>
         </div>
         <div className="card p-4">
-          <div className="text-xs text-ink-500 dark:text-obsidian-400 mb-2">Por mÃ©todo de pago</div>
+          <div className="text-xs text-ink-500 dark:text-obsidian-400 mb-2">Por método de pago</div>
           {summary ? (
             <div className="space-y-1 text-sm">
               <div className="flex justify-between"><span className="text-ink-500 dark:text-obsidian-400">Efectivo</span><span className="font-medium">{money(summary.by_method.cash)}</span></div>
               <div className="flex justify-between"><span className="text-ink-500 dark:text-obsidian-400">Tarjeta</span><span className="font-medium">{money(summary.by_method.card)}</span></div>
               <div className="flex justify-between"><span className="text-ink-500 dark:text-obsidian-400">Transferencia</span><span className="font-medium">{money(summary.by_method.transfer)}</span></div>
             </div>
-          ) : <div className="text-sm text-ink-400">â€”</div>}
+          ) : <div className="text-sm text-ink-400">—</div>}
         </div>
         <div className="card p-4">
-          <div className="text-xs text-ink-500 dark:text-obsidian-400 mb-2">Neto del dÃ­a</div>
+          <div className="text-xs text-ink-500 dark:text-obsidian-400 mb-2">Neto del día</div>
           <div className={`text-2xl font-bold ${(summary?.net || 0) >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400"}`}>
             {money(summary?.net || 0)}
           </div>
@@ -356,7 +366,7 @@ export default function Expenses() {
 
       {summary && summary.by_category && summary.by_category.length > 0 && (
         <div className="card p-4 mb-4">
-          <h3 className="text-sm font-semibold text-ink-700 dark:text-obsidian-100 mb-3">Por categorÃ­a (hoy)</h3>
+          <h3 className="text-sm font-semibold text-ink-700 dark:text-obsidian-100 mb-3">Por categoría (hoy)</h3>
           <div className="space-y-2">
             {summary.by_category.map((c) => {
               const Icon = ICON_MAP[c.icon] || Receipt;
@@ -384,7 +394,7 @@ export default function Expenses() {
 
       {/* Tabla */}
       {loading ? (
-        <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Cargandoâ€¦</div>
+        <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">Cargando…</div>
       ) : expenses.length === 0 ? (
         <div className="card p-8 text-center text-ink-500 dark:text-obsidian-400">
           <TrendingDown size={32} className="mx-auto text-ink-300 dark:text-obsidian-300 mb-2"/>
@@ -402,10 +412,10 @@ export default function Expenses() {
               <thead className="bg-paper-100 dark:bg-obsidian-950 text-ink-600 dark:text-obsidian-200 text-xs uppercase">
                 <tr>
                   <th className="text-left  px-4 py-2.5">Fecha</th>
-                  <th className="text-left  px-4 py-2.5">CategorÃ­a</th>
-                  <th className="text-left  px-4 py-2.5">DescripciÃ³n</th>
+                  <th className="text-left  px-4 py-2.5">Categoría</th>
+                  <th className="text-left  px-4 py-2.5">Descripción</th>
                   <th className="text-right px-4 py-2.5">Monto</th>
-                  <th className="text-left  px-4 py-2.5">MÃ©todo</th>
+                  <th className="text-left  px-4 py-2.5">Método</th>
                   <th className="text-left  px-4 py-2.5">Registrado por</th>
                   <th className="px-4 py-2.5"></th>
                 </tr>
@@ -418,10 +428,10 @@ export default function Expenses() {
                       <div className="text-xs text-ink-500 dark:text-obsidian-400">{formatTime(e.created_at)}</div>
                     </td>
                     <td className="px-4 py-3">{renderCat({ name: e.category_name, icon: e.category_icon })}</td>
-                    <td className="px-4 py-3 text-ink-600 dark:text-obsidian-200 max-w-xs truncate">{e.description || "â€”"}</td>
+                    <td className="px-4 py-3 text-ink-600 dark:text-obsidian-200 max-w-xs truncate">{e.description || "—"}</td>
                     <td className="px-4 py-3 text-right font-semibold text-rose-700 dark:text-rose-400">{money(e.amount)}</td>
                     <td className="px-4 py-3">{renderMethod(e.payment_method)}</td>
-                    <td className="px-4 py-3 text-ink-600 dark:text-obsidian-200 text-xs">{e.user_name || "â€”"}</td>
+                    <td className="px-4 py-3 text-ink-600 dark:text-obsidian-200 text-xs">{e.user_name || "—"}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex gap-1 justify-end">
                         <button
@@ -459,7 +469,7 @@ export default function Expenses() {
 
       <div className="mt-4 text-xs text-ink-500 dark:text-obsidian-400 flex items-center gap-1">
         <ArrowRight size={12}/>
-        TambiÃ©n podÃ©s ver estos datos en el <Link to="/cashier/closing" className="text-brand-600 hover:underline">Corte de caja</Link>.
+        También podés ver estos datos en el <Link to="/cashier/closing" className="text-brand-600 hover:underline">Corte de caja</Link>.
       </div>
 
       <ExpenseModal
