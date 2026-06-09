@@ -28,6 +28,7 @@ async function pendingOrdersFor(closingDate) {
       WHERE (o.status NOT IN ('delivered','paid','cancelled')
              OR o.payment_status <> 'paid')
         AND o.status <> 'cancelled'
+        AND o.payment_status <> 'debt'
       ORDER BY o.created_at
       LIMIT 50`
   );

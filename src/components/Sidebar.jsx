@@ -15,6 +15,7 @@ import {
   ScrollText,
   TrendingDown,
   Package,
+  AlertTriangle,
 } from "lucide-react";
 
 const items = [
@@ -22,6 +23,7 @@ const items = [
   { to: "/tables",       label: "Mesas",          icon: Utensils,        roles: ["admin", "waiter"] },
   { to: "/menu",         labelKey: "catalog",     icon: BookOpen,        roles: ["admin", "waiter"] },
   { to: "/delivery",     label: "Domicilios",     icon: Truck,           roles: ["admin"] },
+  { to: "/debts",        label: "Deudas",         icon: AlertTriangle,   roles: ["admin"] },
   { to: "/cashier",      label: "Caja",           icon: Calculator,      roles: ["admin"] },
   { to: "/cashier/closing", label: "Corte de caja", icon: ScrollText,    roles: ["admin"] },
   { to: "/admin/expenses",  label: "Gastos",      icon: TrendingDown,    roles: ["admin"] },

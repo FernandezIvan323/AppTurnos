@@ -5,7 +5,7 @@ import Header from "../../components/Header";
 import { useAuth } from "../../store/auth";
 import { money, formatTime, statusLabels, statusColors } from "../../lib/format";
 import {
-  Plus, X, Minus, CheckCircle2, Receipt, Clock, ChefHat, ArrowLeft, Utensils, History,
+  Plus, X, Minus, CheckCircle2, Receipt, Clock, ChefHat, ArrowLeft, Utensils, History, AlertTriangle,
 } from "lucide-react";
 
 function timeAgo(iso) {
@@ -68,6 +68,13 @@ function OrderModal({ table, onClose, onChanged, onGoCashier }) {
     } catch (e) { setError(e.response?.data?.error || e.message); }
   };
 
+  const markDebt = async () => {
+    try {
+      await api.post(`/orders/${order.id}/mark-delivered`);
+      await load(); onChanged();
+    } catch (e) { setError(e.response?.data?.error || e.message); }
+  };
+
   const total = items.reduce((s, x) => s + Number(x.unit_price) * x.quantity, 0);
 
   if (loading) return (
@@ -91,13 +98,18 @@ function OrderModal({ table, onClose, onChanged, onGoCashier }) {
         </div>
 
         {order && order.status === "ready_to_pay" && (
-          <div className="px-5 py-2.5 bg-amber-50 border-b border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 flex items-center justify-between">
+          <div className="px-5 py-2.5 bg-amber-50 border-b border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 flex items-center justify-between gap-2">
             <div className="text-sm text-amber-800 dark:text-amber-200 flex items-center gap-2">
               <Receipt size={14}/> Esta cuenta está lista para cobrar
             </div>
-            <button onClick={() => onGoCashier(order)} className="btn-primary text-xs h-8">
-              <CheckCircle2 size={14}/> Ir a cobrar
-            </button>
+            <div className="flex gap-2">
+              <button onClick={() => onGoCashier(order)} className="btn-primary text-xs h-8">
+                <CheckCircle2 size={14}/> Cobrar
+              </button>
+              <button onClick={markDebt} className="btn-secondary text-xs h-8 border-rose-300 text-rose-700 hover:bg-rose-50 dark:border-rose-800 dark:text-rose-300 dark:hover:bg-rose-900/20">
+                <AlertTriangle size={14}/> Deuda
+              </button>
+            </div>
           </div>
         )}
 

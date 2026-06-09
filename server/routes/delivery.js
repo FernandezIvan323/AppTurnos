@@ -17,9 +17,10 @@ router.get("/history", authRequired, requireRole("admin"), async (req, res) => {
   const { delivery_person_id, limit = 50 } = req.query;
   if (!delivery_person_id) return res.status(400).json({ error: "delivery_person_id requerido" });
   const { rows } = await query(
-    `SELECT o.id, o.created_at, o.customer_name, o.customer_address,
+    `SELECT o.id, o.created_at, c.name AS customer_name, c.address AS customer_address,
             o.total, o.payment_method, o.status
      FROM orders o
+     LEFT JOIN customers c ON c.id = o.customer_id
      WHERE o.delivery_person_id = $1 AND o.type = 'delivery'
      ORDER BY o.created_at DESC
      LIMIT $2`,

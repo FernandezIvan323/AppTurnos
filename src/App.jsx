@@ -8,6 +8,7 @@ import Cashier from "./pages/cashier/Cashier";
 import CashClosing from "./pages/cashier/CashClosing";
 import ClosingHistory from "./pages/cashier/ClosingHistory";
 import Customers from "./pages/customers/Customers";
+import Debts from "./pages/Debts";
 import Menu from "./pages/admin/Menu";
 import Staff from "./pages/admin/Staff";
 import Reports from "./pages/admin/Reports";
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/cashier" element={<Cashier />} />
         <Route path="/cashier/closing" element={<CashClosing />} />
         <Route path="/cashier/closing/history" element={<ClosingHistory />} />
+        <Route path="/debts" element={<Debts />} />
         <Route path="/customers" element={<Customers />} />
         <Route path="/admin/expenses" element={<Expenses />} />
         <Route path="/menu" element={<Menu />} />

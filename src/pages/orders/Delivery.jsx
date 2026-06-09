@@ -436,6 +436,11 @@ function OrderDetailModal({ order, onClose, onChanged }) {
     onChanged(); onClose();
   };
 
+  const markDebt = async () => {
+    await api.post(`/orders/${order.id}/mark-delivered`);
+    onChanged(); onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
       <div className="card w-full max-w-2xl p-5 max-h-[90vh] overflow-y-auto">
@@ -474,9 +479,14 @@ function OrderDetailModal({ order, onClose, onChanged }) {
           <span className="text-2xl font-bold text-ink-800 dark:text-obsidian-50">{money(order.total)}</span>
         </div>
         {order.status === "on_the_way" && (
-          <button onClick={closePaid} className="btn-primary w-full mt-4">
-            <CheckCircle2 size={16}/> Marcar entregado y cobrado
-          </button>
+          <div className="flex gap-2 mt-4">
+            <button onClick={closePaid} className="btn-primary flex-1">
+              <CheckCircle2 size={16}/> Entregado y cobrado
+            </button>
+            <button onClick={markDebt} className="btn-secondary flex-1 border-rose-300 text-rose-700 hover:bg-rose-50 dark:border-rose-800 dark:text-rose-300 dark:hover:bg-rose-900/20">
+              <AlertTriangle size={16}/> Entregado (deuda)
+            </button>
+          </div>
         )}
       </div>
     </div>
@@ -507,6 +517,7 @@ function HistoryModal({ onClose }) {
   };
 
   const pname = persons.find((p) => p.id === selected)?.name || "";
+  const totalEarned = history.reduce((s, o) => s + Number(o.total), 0);
 
   return (
     <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
@@ -540,19 +551,25 @@ function HistoryModal({ onClose }) {
             <div className="text-sm text-ink-400 dark:text-obsidian-500 text-center py-8">{pname} no tiene entregas registradas.</div>
           )}
           {selected && !loading && history.length > 0 && (
-            <div className="space-y-2">
-              {history.map((o) => (
-                <div key={o.id} className="flex items-center justify-between card p-3 text-sm">
-                  <div>
-                    <div className="font-medium text-ink-800 dark:text-obsidian-50">#{o.id} · {o.customer_name}</div>
-                    <div className="text-xs text-ink-500 dark:text-obsidian-400">{o.customer_address}</div>
+            <div>
+              <div className="card p-3 bg-brand-50/60 border-brand-200 dark:bg-wine-900/20 dark:border-wine-800 mb-3 flex items-center justify-between">
+                <span className="text-sm font-medium text-ink-700 dark:text-obsidian-100">Total entregado</span>
+                <span className="text-lg font-bold text-brand-700 dark:text-wine-300">{money(totalEarned)}</span>
+              </div>
+              <div className="space-y-2">
+                {history.map((o) => (
+                  <div key={o.id} className="flex items-center justify-between card p-3 text-sm">
+                    <div>
+                      <div className="font-medium text-ink-800 dark:text-obsidian-50">#{o.id} · {o.customer_name}</div>
+                      <div className="text-xs text-ink-500 dark:text-obsidian-400">{o.customer_address}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-ink-700 dark:text-obsidian-100">{money(o.total)}</div>
+                      <div className="text-xs text-ink-400 dark:text-obsidian-500">{new Date(o.created_at).toLocaleDateString()}</div>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-ink-700 dark:text-obsidian-100">{money(o.total)}</div>
-                    <div className="text-xs text-ink-400 dark:text-obsidian-500">{new Date(o.created_at).toLocaleDateString()}</div>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -342,6 +342,62 @@ router.post("/:id/prepay", authRequired, requireRole("admin"), async (req, res) 
   }
 });
 
+// Marcar como entregado sin cobrar (deuda)
+router.post("/:id/mark-delivered", authRequired, requireRole("admin"), async (req, res) => {
+  try {
+    await withTransaction(async (client) => {
+      const { rows } = await client.query(
+        "SELECT delivery_person_id FROM orders WHERE id = $1 FOR UPDATE",
+        [req.params.id]
+      );
+      if (rows.length === 0) throw new HttpError(404, "No existe");
+      if (rows[0].delivery_person_id) {
+        await client.query(
+          "UPDATE delivery_persons SET status = 'available' WHERE id = $1",
+          [rows[0].delivery_person_id]
+        );
+      }
+      await deductStockForOrder(client, req.params.id);
+      await client.query(
+        `UPDATE orders
+            SET status = 'delivered',
+                payment_status = 'debt',
+                closed_at = NOW()
+          WHERE id = $1`,
+        [req.params.id]
+      );
+    });
+    res.json({ ok: true, debt: true });
+  } catch (e) {
+    const status = e.status || 500;
+    if (status === 500) console.error("[orders:POST /:id/mark-delivered]", e);
+    res.status(status).json({ error: e.message || "Error interno" });
+  }
+});
+
+// Cobrar deuda pendiente
+router.post("/:id/pay-debt", authRequired, requireRole("admin"), async (req, res) => {
+  const { payment_method = "cash" } = req.body;
+  try {
+    const { rows } = await query(
+      "SELECT id, payment_status FROM orders WHERE id = $1",
+      [req.params.id]
+    );
+    if (rows.length === 0) return res.status(404).json({ error: "No existe" });
+    if (rows[0].payment_status !== "debt")
+      return res.status(409).json({ error: "El pedido no tiene deuda pendiente" });
+    await query(
+      `UPDATE orders SET payment_status = 'paid', payment_method = $2 WHERE id = $1`,
+      [req.params.id, payment_method]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    const status = e.status || 500;
+    if (status === 500) console.error("[orders:POST /:id/pay-debt]", e);
+    res.status(status).json({ error: e.message || "Error interno" });
+  }
+});
+
 // Reabrir pedido cerrado por error (admin)
 router.post("/:id/reopen", authRequired, requireRole("admin"), async (req, res) => {
   try {
