@@ -18,8 +18,26 @@ function Test-Port([int]$Port) {
 }
 
 function Kill-Port([int]$Port) {
+  # Mata el proceso que escucha en el puerto + su padre --watch + cualquier
+  # otro node server/index.js huérfano. Esto evita que node --watch
+  # re-arranque el servidor zombie después de matarlo.
   Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue |
-    ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }
+    ForEach-Object {
+      $childPid = $_.OwningProcess
+      Stop-Process -Id $childPid -Force -ErrorAction SilentlyContinue
+      # Matar el watcher padre (node --watch ... server/index.js)
+      $child = Get-CimInstance Win32_Process -Filter "ProcessId=$childPid" -ErrorAction SilentlyContinue
+      if ($child -and $child.ParentProcessId) {
+        $parent = Get-CimInstance Win32_Process -Filter "ProcessId=$($child.ParentProcessId)" -ErrorAction SilentlyContinue
+        if ($parent -and $parent.Name -eq 'node.exe' -and $parent.CommandLine -like '*server/index.js*') {
+          Stop-Process -Id $parent.ProcessId -Force -ErrorAction SilentlyContinue
+        }
+      }
+    }
+  # Matar cualquier otro proceso node server/index.js (watchers huérfanos)
+  Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -like '*server/index.js*' } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
   # Esperar hasta que el puerto esté realmente libre (máx 5s)
   for ($i = 0; $i -lt 10; $i++) {
     if (-not (Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue)) {
