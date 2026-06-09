@@ -7,7 +7,7 @@ import { serverEvents } from "../lib/events";
  * Banner fijo que aparece cuando el servidor no responde.
  * - Hace ping a /api/health cada 10s como respaldo.
  * - Ademas escucha serverEvents (emitido por axios) para aparecer de inmediato.
- * - El boton "Reintentar" fuerza un re-check inmediato y recarga la pagina si todo bien.
+ * - El boton "Reintentar" fuerza un re-check inmediato y oculta el banner si todo bien.
  */
 export default function ServerStatus() {
   const [show, setShow] = useState(false);
@@ -17,10 +17,7 @@ export default function ServerStatus() {
   const probe = async () => {
     try {
       await api.get("/health", { timeout: 5000 });
-      if (wasDownRef.current) {
-        wasDownRef.current = false;
-        window.location.reload();
-      }
+      wasDownRef.current = false;
       setShow(false);
       return true;
     } catch (_) {
