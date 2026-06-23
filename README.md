@@ -1,5 +1,5 @@
 ![Build](https://img.shields.io/badge/build-passing-brightgreen?logo=github)
-![Version](https://img.shields.io/badge/version-1.1.3-blue?logo=react)
+![Version](https://img.shields.io/badge/version-1.1.4-blue?logo=react)
 ![Node](https://img.shields.io/badge/node-18%2B-339933?logo=nodedotjs)
 ![React](https://img.shields.io/badge/react-19-61DAFB?logo=react)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-18%2B-4169E1?logo=postgresql)
@@ -32,6 +32,7 @@ Diseñado para que cualquier persona con una computadora pueda operarlo — sin 
 
 ### 🛵 Pedidos a domicilio (módulo crítico)
 - **Tablero Kanban** con 4 columnas: Pendientes → En preparación → En camino → Entregados.
+- **Turnos FIFO**: resalta el siguiente pedido con badge y borde especial.
 - **Búsqueda predictiva de clientes** por nombre o teléfono con dropdown.
 - **Multi-repartidor**: un repartidor puede llevar varios pedidos simultáneamente. Cada uno muestra sus órdenes activas.
 - **Historial de entregas** por repartidor con **total acumulado** de dinero entregado.
@@ -43,8 +44,18 @@ Diseñado para que cualquier persona con una computadora pueda operarlo — sin 
 - **Propina**: 0%, 10%, 15% o 20% sobre el total.
 - **Dividir cuenta**: elige entre cuántas personas dividir y ve el monto por persona.
 
+### 📦 Para llevar (pickup)
+- **Tablero Kanban** con 3 columnas: Pendientes → En preparación → Listo para recoger.
+- **Creación rápida** desde el catálogo de productos con carrito de compras.
+- **Tiempo estimado** configurable por pedido (5, 10, 15, 20, 30 min).
+- **Turnos FIFO**: resalta el siguiente pedido con badge y borde especial.
+- **Tiempo de espera**: muestra tiempo transcurrido y countdown del estimado.
+- **Cobro integrado**: efectivo, tarjeta o transferencia directamente desde la vista.
+- **Cancelación** con motivo obligatorio.
+
 ### 🪑 Mesas
 - Tablero visual con colores: verde (libre), rosa (pendiente), azul (preparando), ámbar (lista para cobrar).
+- **Turnos FIFO**: mesas ocupadas ordenadas por antigüedad, badge del siguiente pedido.
 - Cada mesa ocupada muestra: total, productos, tiempo transcurrido.
 - Apertura de cuenta al agregar el primer producto.
 - Botón directo "Ir a cobrar".
@@ -59,7 +70,7 @@ Diseñado para que cualquier persona con una computadora pueda operarlo — sin 
 
 ### 💰 Caja / Cobro
 - Pedidos pendientes agrupados por antigüedad.
-- Filtros: todos / solo mesas / solo domicilios.
+- Filtros: todos / solo mesas / solo domicilios / solo para llevar.
 - Métodos de pago: efectivo, tarjeta, transferencia, mixto.
 - Corte de caja diario (1 por día, bloquea si hay pendientes, inmutable).
 - Vista de histórico de cortes.
@@ -88,13 +99,15 @@ Diseñado para que cualquier persona con una computadora pueda operarlo — sin 
 - **Asignación de mesas** a meseros (una mesa solo a un mesero a la vez).
 
 ### 📈 Reportes
-- **Resumen de ventas** con comparativa vs período anterior.
+- **5 tabs**: Resumen, Productos, Clientes, Operación, Historial.
+- **Resumen**: ventas del día, comparativa vs período anterior, ticket promedio, domicilios, pickup, mesas.
+- **Métodos de pago**: desglose de ingresos por efectivo, tarjeta, transferencia y mixto.
 - **Top 10 productos** por cantidad o por ganancia.
-- **Ventas por categoría**.
-- **Horarios pico** (gráfico de 24 horas).
-- **Clientes más frecuentes**.
-- **Productos nunca vendidos**.
-- **Reporte diario completo**: ventas, propinas, gastos, neto, top productos, categorías — en formato imprimible / PDF.
+- **Productos nunca vendidos** (candidatos a retirar).
+- **Clientes más frecuentes** con gasto total.
+- **Operación**: horarios pico (gráfico vertical) y ventas por categoría.
+- **Historial**: tabla de días con ventas, gastos, neto, tipo de pedidos y estado del corte de caja.
+- **Reporte diario completo**: ventas, propinas, gastos, neto, métodos de pago, top productos, categorías — en formato imprimible / PDF.
 
 ### 🎨 UI/UX
 - **Modo claro / oscuro** con toggle en el Header (persiste en localStorage, detecta preferencia del SO).
@@ -152,16 +165,16 @@ AppTurnos/
 │       ├── dashboard.js          # KPIs en tiempo real
 │       ├── cashClosings.js       # Corte de caja diario
 │       ├── expenses.js           # Gastos operativos
-│       └── reports.js            # 8 endpoints de reportes (incl. daily-complete)
+│       └── reports.js            # 9 endpoints de reportes (incl. daily-complete, daily-history)
 │
 ├── src/                          # Frontend React
-│   ├── App.jsx                   # Router principal
+│   ├── App.jsx                   # Router principal (incluye /pickup)
 │   ├── main.jsx                  # Entry point
 │   ├── index.css                 # Tailwind + componentes + Tokyo Night dark mode
 │   ├── lib/
 │   │   ├── api.js                # Axios con interceptors, retry, eventos network
 │   │   ├── date.js               # Helpers de fecha (todayLocalISO, dateOnlyUTC)
-│   │   └── format.js             # money, formatTime, statusLabels, etc.
+│   │   └── format.js             # money, formatTime, statusLabels, assignTurns, waitMinutes
 │   ├── store/                    # Zustand stores
 │   │   ├── auth.js
 │   │   ├── theme.js              # Persistente en localStorage
@@ -170,7 +183,7 @@ AppTurnos/
 │   │   └── resources.js
 │   ├── components/
 │   │   ├── Layout.jsx            # Layout principal + ServerStatus
-│   │   ├── Sidebar.jsx           # Menú lateral con dark mode
+│   │   ├── Sidebar.jsx           # Menú lateral con "Para llevar" y dark mode
 │   │   ├── Header.jsx            # Header de página + ThemeToggle
 │   │   ├── ThemeToggle.jsx       # Botón ☀/🌙
 │   │   ├── ServerStatus.jsx      # Banner rojo cuando el server cae
@@ -181,11 +194,13 @@ AppTurnos/
 │       ├── Dashboard.jsx         # Admin + Waiter dashboard
 │       ├── Debts.jsx             # Control de deudas pendientes
 │       ├── orders/
-│       │   └── Delivery.jsx      # Kanban + crear pedido + historial
+│       │   ├── Delivery.jsx      # Kanban + crear pedido + historial
+│       │   └── pickup/
+│       │       └── PickupPage.jsx # Kanban pickup + creación + cobro
 │       ├── tables/
 │       │   └── TablesPage.jsx    # Tablero de mesas + historial
 │       ├── cashier/
-│       │   ├── Cashier.jsx       # Cobro con propina y dividir cuenta
+│       │   ├── Cashier.jsx       # Cobro con propina, dividir cuenta y turnos FIFO
 │       │   ├── CashClosing.jsx   # Corte de caja diario
 │       │   └── ClosingHistory.jsx
 │       ├── customers/
@@ -221,14 +236,15 @@ AppTurnos/
 | `tables` | Mesas físicas del restaurant |
 | `customers` | Clientes de domicilio |
 | `delivery_persons` | Repartidores |
-| `orders` | Pedidos (type, status, payment_status, total, tip) |
+| `orders` | Pedidos (type, status, payment_status, total, tip, estimate_minutes) |
 | `order_items` | Items de cada pedido con snapshot de precio |
 | `cash_closings` | Cortes de caja diarios |
 | `expenses` | Gastos operativos |
 
 ### Estados de pedido
 `pending → preparing → on_the_way → delivered` (domicilios)  
-`pending → preparing → ready_to_pay → delivered` (mesas)
+`pending → preparing → ready_to_pay → delivered` (mesas)  
+`pending → preparing → ready_to_pay → delivered` (pickup)
 
 ### Estados de pago
 `pending → paid` (pago normal)  
@@ -355,6 +371,37 @@ MESAS (en el restaurant)
 ┌─────────────────────┐
 │    Pagado ✅        │  Stock deducido automáticamente
 └─────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PARA LLEVAR (pickup / walk-in)
+
+┌─────────────────────┐
+│  Crear pedido       │  Cajero: nuevo pedido pickup
+│  (catálogo)         │  Seleccionar productos
+└─────────┬───────────┘  Tiempo estimado (5-30 min)
+          │
+          ▼
+┌─────────────────────┐
+│    Pendiente 🔢     │  Turno #1, #2, #3...
+│  (turno FIFO)       │  Badge del siguiente
+└─────────┬───────────┘
+          │
+          ▼
+┌─────────────────────┐
+│  En preparación 👨‍🍳  │  Cocina prepara
+└─────────┬───────────┘
+          │
+          ▼
+┌─────────────────────┐
+│  Listo para recoger │  Cliente llega
+│        🟢           │  → Cobrar (efectivo/tarjeta/transfer)
+└─────────┬───────────┘
+          │
+          ▼
+┌─────────────────────┐
+│    Pagado ✅        │  Stock deducido automáticamente
+└─────────────────────┘
 ```
 
 ---
@@ -434,6 +481,7 @@ MESAS (en el restaurant)
 | GET | `/api/reports/top-customers` |
 | GET | `/api/reports/never-sold` |
 | GET | `/api/reports/daily-complete` |
+| GET | `/api/reports/daily-history` |
 
 ### Otros
 | Método | Ruta |
@@ -475,6 +523,30 @@ npm run preview        # Sirve build de producción
 ---
 
 ## 📋 Changelog
+
+### v1.1.4 (2026-06-22) — Pedidos pickup, turnos FIFO, reportes historial
+- **Pedidos "Para llevar" (pickup)**: nueva página completa `/pickup` con:
+  - Tablero Kanban de 3 columnas (pendiente → preparación → listo para recoger).
+  - Creación desde catálogo con carrito, tiempo estimado (5-30 min) y notas por item.
+  - Cobro integrado (efectivo, tarjeta, transferencia) directamente desde la vista.
+  - Cancelación con motivo obligatorio.
+- **Sistema de turnos FIFO**: función `assignTurns()` aplicada en:
+  - Domicilios (badge del siguiente pedido con borde especial).
+  - Mesas ocupadas (ordenadas por antigüedad).
+  - Caja (turno numérico en cada pedido).
+  - Pickup (turno y countdown del tiempo estimado).
+- **Reportes rediseñados** con 5 tabs:
+  - **Resumen**: 6 StatCards (ventas, pedidos, ticket, domicilios, pickup, mesas), métodos de pago, gráfico de ventas, comparativa.
+  - **Productos**: top productos (cantidad/ganancia) + productos nunca vendidos.
+  - **Clientes**: top 10 por gasto total.
+  - **Operación**: horarios pico (gráfico vertical) + ventas por categoría.
+  - **Historial**: tabla de días con ventas, gastos, neto, tipos de pedido y estado del corte de caja.
+- **Endpoint `/reports/daily-history`**: historial de días con ventas, gastos y neto (usa `generate_series`).
+- **Reporte diario mejorado**: incluye métodos de pago y conteo de pedidos pickup.
+- **BarChart mejorado**: modo vertical, colores personalizados, valores en barras.
+- **Dark mode completado**: DailyReport, Inventory, Expenses ahora soportan modo oscuro.
+- **Fix Expenses**: resumen de gastos ahora usa la fecha del filtro activo.
+- **Backend**: migración `estimate_minutes` en orders, columnas `pickup_orders`/`pickup_count` en reportes.
 
 ### v1.1.3 (2026-06-09) — Control de deudas y estabilidad
 - **Deudas**: nuevo módulo de control de pedidos no pagados.
